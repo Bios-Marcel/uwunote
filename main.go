@@ -2,18 +2,58 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
+
+	"os"
+	"path/filepath"
 
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
 )
 
-func main() {
-	//Error variable to be reused
-	var gtkError error
+var (
+	notePath string = filepath.FromSlash(os.Getenv("HOME") + string(os.PathSeparator) + "notes")
+)
 
+func main() {
 	// Initialize GTK without parsing any command line arguments.
 	gtk.Init(nil)
+
+	generateNoteWindows()
+
+	// Begin executing the GTK main loop.  This blocks until
+	// gtk.MainQuit() is run.
+	gtk.Main()
+}
+
+func generateNoteWindows() {
+	var files []string
+
+	err := filepath.Walk(notePath, func(path string, info os.FileInfo, err error) error {
+		//We wil ignore all notes that lie on second level
+		if info != nil && info.IsDir() {
+			return nil
+		}
+
+		files = append(files, path)
+		return nil
+	})
+
+	if err != nil {
+		log.Fatal("Error creating notes.")
+		panic(err)
+	}
+
+	for index, file := range files {
+		pos := (index + 1) * 100
+		createWindowForNote(file, pos, pos)
+	}
+}
+
+func createWindowForNote(file string, x int, y int) {
+	//Error variable to be reused
+	var gtkError error
 
 	// Create a new toplevel window and connect it to the
 	// "destroy" signal to exit the GTK main loop when it is destroyed.
@@ -60,7 +100,8 @@ func main() {
 	buffer, gtkError := textView.GetBuffer()
 	panicOnError(gtkError)
 
-	buffer.SetText("Oh, hello.")
+	fileContent, _ := ioutil.ReadFile(file)
+	buffer.SetText(string(fileContent))
 
 	nodeLayout, gtkError := gtk.BoxNew(gtk.ORIENTATION_VERTICAL, 0)
 	panicOnError(gtkError)
@@ -72,15 +113,11 @@ func main() {
 
 	win.Add(nodeLayout)
 
-	// Set the default window size.
-	win.SetDefaultSize(800, 600)
+	win.Move(x, y)
+	win.SetDefaultSize(x, y)
 
 	// Recursively show all widgets contained in this window.
 	win.ShowAll()
-
-	// Begin executing the GTK main loop.  This blocks until
-	// gtk.MainQuit() is run.
-	gtk.Main()
 }
 
 // Panics if the given value isn't nil
