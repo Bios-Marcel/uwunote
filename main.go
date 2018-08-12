@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 
@@ -10,10 +9,13 @@ import (
 
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
+
+	"github.com/satori/go.uuid"
 )
 
 var (
-	notePath string = filepath.FromSlash(os.Getenv("HOME") + string(os.PathSeparator) + "notes")
+	//Will lateron be customizable
+	notePath = filepath.FromSlash(os.Getenv("HOME") + string(os.PathSeparator) + "notes")
 )
 
 func main() {
@@ -46,8 +48,8 @@ func generateNoteWindows() {
 	}
 
 	for index, file := range files {
-		pos := (index + 1) * 100
-		createWindowForNote(file, pos, pos)
+		pos := index * 310
+		createWindowForNote(file, pos, 0)
 	}
 }
 
@@ -60,29 +62,51 @@ func createWindowForNote(file string, x int, y int) {
 	win, gtkError := gtk.WindowNew(gtk.WINDOW_TOPLEVEL)
 	panicOnError(gtkError)
 
-	win.Connect("destroy", func() {
+	// The app isn't killable for now.
+	/*win.Connect("destroy", func() {
 		gtk.MainQuit()
-	})
+	})*/
 
 	win.SetTitle("Sticky background window")
 
-	//Remove taskbar icon
-	win.SetSkipTaskbarHint(true)
-	//Remove platform windowframe
-	win.SetDecorated(false)
 	//Make window stick on desktop
+	//TODO Fix problems: Prevents DND, Allows offscreen placement
 	win.SetTypeHint(gdk.WINDOW_TYPE_HINT_DESKTOP)
 
-	win.SetPosition(gtk.WIN_POS_CENTER)
-	//win.Maximize()
-
-	saveButton, gtkError := gtk.ButtonNew()
+	newButton, gtkError := gtk.ButtonNew()
 	panicOnError(gtkError)
 
-	saveButton.SetLabel("Save")
-	saveButton.Connect("clicked", func() {
-		fmt.Println("Clicked")
+	newButton.SetLabel("New")
+	newButton.Connect("clicked", func() {
+		fileName := uuid.Must(uuid.NewV4())
+		newNotePath := notePath + string(os.PathSeparator) + fileName.String() + ".md"
+		os.Create(newNotePath)
+		createWindowForNote(newNotePath, x+20, y+20)
 	})
+	newButton.SetHExpand(false)
+
+	deleteButton, gtkError := gtk.ButtonNew()
+	panicOnError(gtkError)
+
+	deleteButton.SetLabel("Delete")
+	deleteButton.Connect("clicked", func() {
+		os.Remove(file)
+		win.Destroy()
+	})
+	deleteButton.SetHExpand(false)
+	deleteButton.SetHAlign(gtk.ALIGN_END)
+
+	topBar, gtkError := gtk.HeaderBarNew()
+	panicOnError(gtkError)
+
+	topBar.Add(newButton)
+
+	sep, gtkError := gtk.SeparatorToolItemNew()
+	panicOnError(gtkError)
+	sep.SetHExpand(true)
+	topBar.Add(sep)
+
+	topBar.Add(deleteButton)
 
 	var hAdjustment, vAdjustment *gtk.Adjustment
 	textViewScrollPane, gtkError := gtk.ScrolledWindowNew(hAdjustment, vAdjustment)
@@ -106,15 +130,15 @@ func createWindowForNote(file string, x int, y int) {
 	nodeLayout, gtkError := gtk.BoxNew(gtk.ORIENTATION_VERTICAL, 0)
 	panicOnError(gtkError)
 
-	nodeLayout.Add(saveButton)
-
 	nodeLayout.Add(textViewScrollPane)
 	nodeLayout.SetVExpand(true)
 
+	win.SetTitlebar(topBar)
 	win.Add(nodeLayout)
 
+	win.SetResizable(true)
 	win.Move(x, y)
-	win.SetDefaultSize(x, y)
+	win.SetDefaultSize(300, 350)
 
 	// Recursively show all widgets contained in this window.
 	win.ShowAll()
