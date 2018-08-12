@@ -4,10 +4,11 @@ import (
 	"io/ioutil"
 	"log"
 
+	"github.com/gotk3/gotk3/gdk"
+
 	"os"
 	"path/filepath"
 
-	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
 
 	"github.com/satori/go.uuid"
@@ -69,15 +70,12 @@ func createWindowForNote(file string, x int, y int) {
 
 	win.SetTitle("Sticky background window")
 
-	//Make window stick on desktop
-	//TODO Fix problems: Prevents DND, Allows offscreen placement
-	win.SetTypeHint(gdk.WINDOW_TYPE_HINT_DESKTOP)
-
 	newButton, gtkError := gtk.ButtonNew()
 	panicOnError(gtkError)
 
 	newButton.SetLabel("New")
 	newButton.Connect("clicked", func() {
+		win.Iconify()
 		fileName := uuid.Must(uuid.NewV4())
 		newNotePath := notePath + string(os.PathSeparator) + fileName.String() + ".md"
 		os.Create(newNotePath)
@@ -136,7 +134,19 @@ func createWindowForNote(file string, x int, y int) {
 	win.SetTitlebar(topBar)
 	win.Add(nodeLayout)
 
-	win.SetResizable(true)
+	win.SetSkipTaskbarHint(true)
+	win.SetSkipPagerHint(true)
+	win.SetKeepBelow(true)
+	win.Stick()
+
+	win.Connect("window-state-event", func(widget *gtk.Window, event *gdk.Event) {
+		newWindowState := gdk.EventWindowStateNewFromEvent(event).NewWindowState()
+		//TODO Stop using magic number
+		if newWindowState == 87114 {
+			widget.Present()
+		}
+	})
+
 	win.Move(x, y)
 	win.SetDefaultSize(300, 350)
 
