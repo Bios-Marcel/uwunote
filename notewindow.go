@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
@@ -11,36 +12,37 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-func createWindowForNote(file string, x int, y int) {
+func createWindowForNote(file string, x, y, width, height int) {
 	//Error variable to be reused
 	var gtkError error
 
 	// Create a new toplevel window and connect it to the
 	// "destroy" signal to exit the GTK main loop when it is destroyed.
 	win, gtkError := gtk.WindowNew(gtk.WINDOW_TOPLEVEL)
-	panicOnError(gtkError)
+	logAndExit(gtkError)
 
 	// The app isn't killable for now.
 	/*win.Connect("destroy", func() {
 		gtk.MainQuit()
 	})*/
 
+	//TODO Is a title necessary at all?
 	win.SetTitle(file)
 
 	newButton, gtkError := gtk.ButtonNew()
-	panicOnError(gtkError)
+	logAndExit(gtkError)
 
 	newButton.SetLabel("New")
 	newButton.Connect("clicked", func() {
 		fileName := uuid.Must(uuid.NewV4())
-		newNotePath := notePath + string(os.PathSeparator) + fileName.String() + ".md"
+		newNotePath := notePath + string(os.PathSeparator) + fileName.String()
 		os.Create(newNotePath)
-		createWindowForNote(newNotePath, x+20, y+20)
+		createWindowForNote(newNotePath, x+20, y+20, 300, 350)
 	})
 	newButton.SetHExpand(false)
 
 	deleteButton, gtkError := gtk.ButtonNew()
-	panicOnError(gtkError)
+	logAndExit(gtkError)
 
 	deleteButton.SetLabel("Delete")
 	deleteButton.Connect("clicked", func() {
@@ -51,17 +53,17 @@ func createWindowForNote(file string, x int, y int) {
 	deleteButton.SetHAlign(gtk.ALIGN_END)
 
 	topBar, gtkError := gtk.HeaderBarNew()
-	panicOnError(gtkError)
+	logAndExit(gtkError)
 
 	topBar.PackStart(newButton)
 	topBar.PackEnd(deleteButton)
 
 	var hAdjustment, vAdjustment *gtk.Adjustment
 	textViewScrollPane, gtkError := gtk.ScrolledWindowNew(hAdjustment, vAdjustment)
-	panicOnError(gtkError)
+	logAndExit(gtkError)
 
 	textView, gtkError := gtk.TextViewNew()
-	panicOnError(gtkError)
+	logAndExit(gtkError)
 
 	textView.SetVExpand(true)
 	textView.SetHExpand(true)
@@ -103,13 +105,13 @@ func createWindowForNote(file string, x int, y int) {
 	textViewScrollPane.Add(textView)
 
 	buffer, gtkError := textView.GetBuffer()
-	panicOnError(gtkError)
+	logAndExit(gtkError)
 
 	fileContent, _ := ioutil.ReadFile(file)
 	buffer.SetText(string(fileContent))
 
 	nodeLayout, gtkError := gtk.BoxNew(gtk.ORIENTATION_VERTICAL, 0)
-	panicOnError(gtkError)
+	logAndExit(gtkError)
 
 	nodeLayout.Add(textViewScrollPane)
 	nodeLayout.SetVExpand(true)
@@ -132,7 +134,34 @@ func createWindowForNote(file string, x int, y int) {
 	})
 
 	win.Move(x, y)
-	win.SetDefaultSize(300, 350)
+	win.SetDefaultSize(width, height)
+
+	win.Connect("configure-event", func(window *gtk.Window, event *gdk.Event) {
+		windowX, windowY := window.GetPosition()
+		windowWidth, windowHeight := window.GetSize()
+
+		noteName := filepath.Base(file)
+		configForWindow, exists := Configuration.Data[noteName]
+
+		if exists {
+			configForWindow.X = windowX
+			configForWindow.Y = windowY
+
+			configForWindow.Width = windowWidth
+			configForWindow.Height = windowHeight
+
+			Configuration.Data[noteName] = configForWindow
+		} else {
+			Configuration.Data[noteName] = WindowData{
+				X:      windowX,
+				Y:      windowY,
+				Width:  windowWidth,
+				Height: windowHeight,
+			}
+		}
+
+		persistWindowConfiguration()
+	})
 
 	// Recursively show all widgets contained in this window.
 	win.ShowAll()
