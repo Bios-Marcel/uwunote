@@ -105,6 +105,38 @@ func createWindowForNote(file string, x, y, width, height int) {
 	fileContent, _ := ioutil.ReadFile(file)
 	buffer.SetText(string(fileContent))
 
+	buffer.ConnectAfter("insert-text", func(textBuffer *gtk.TextBuffer, textIter *gtk.TextIter, chars string) {
+		if chars != "\r\n" && chars != "\n" {
+			return
+		}
+
+		//Count tabs on previous line
+		textIter.BackwardLine()
+		textIter.BackwardChars(textIter.GetLineOffset())
+		amountOfTabs := 0
+		for {
+			if textIter.GetChar() == '\t' {
+				amountOfTabs++
+				if !textIter.EndsLine() {
+					textIter.ForwardChar()
+				} else {
+					break
+				}
+			} else {
+				break
+			}
+		}
+
+		//Insert same amounts of tabs from previous line onto next line
+		if amountOfTabs > 0 {
+			textIter.ForwardLine()
+
+			for i := 0; i < amountOfTabs; i++ {
+				textBuffer.Insert(textIter, "\t")
+			}
+		}
+	})
+
 	nodeLayout, gtkError := gtk.BoxNew(gtk.ORIENTATION_VERTICAL, 0)
 	util.LogAndExitOnError(gtkError)
 
