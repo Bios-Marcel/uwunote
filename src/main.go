@@ -8,7 +8,7 @@ import (
 
 	"github.com/gotk3/gotk3/gtk"
 
-	"github.com/bios-marcel/uwunote/config"
+	"github.com/bios-marcel/uwunote/src/config"
 )
 
 var (
