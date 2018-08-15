@@ -59,29 +59,17 @@ func PersistWindowConfiguration() {
 }
 
 //GetWindowDataForFile retrieves the window-config entry for the given file
-func GetWindowDataForFile(file string) (*WindowData, bool) {
+func GetWindowDataForFile(file string) (WindowData, bool) {
 	data, exists := configuration.Data[file]
-	return &data, exists
+	return data, exists
 }
 
 //SetWindowDataForFile sets coordinates and size in the window-config for the given file
 func SetWindowDataForFile(file string, x, y, width, height int) {
-	configForWindow, exists := configuration.Data[file]
-
-	if exists {
-		configForWindow.X = x
-		configForWindow.Y = y
-
-		configForWindow.Width = width
-		configForWindow.Height = height
-
-		configuration.Data[file] = configForWindow
-	} else {
-		configuration.Data[file] = WindowData{
-			X:      x,
-			Y:      y,
-			Width:  width,
-			Height: height,
-		}
+	configuration.Data[file] = WindowData{
+		X:      x,
+		Y:      y,
+		Width:  width,
+		Height: height,
 	}
 }
