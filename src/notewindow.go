@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
@@ -74,24 +75,7 @@ func createWindowForNote(file string, x, y, width, height int) {
 		keyEvent := gdk.EventKeyNewFromEvent(event)
 		if keyEvent.KeyVal() == gdk.KEY_s {
 			if (keyEvent.State() & gdk.GDK_CONTROL_MASK) == gdk.GDK_CONTROL_MASK {
-				//TODO Following errors on which i now panic should probably inform the user about not being able to save.
-
-				currentNoteBuffer, bufferError := textView.GetBuffer()
-				if bufferError != nil {
-					panic(bufferError)
-				}
-
-				iterStart, iterEnd := currentNoteBuffer.GetBounds()
-				//TODO Check if I need the "Hidden chars"
-				textToSave, textError := currentNoteBuffer.GetText(iterStart, iterEnd, false)
-				if textError != nil {
-					panic(textError)
-				}
-
-				writeError := ioutil.WriteFile(file, []byte(textToSave), os.ModeType)
-				if writeError != nil {
-					panic(writeError)
-				}
+				saveNote(file, textView)
 			}
 		}
 	})
@@ -137,6 +121,21 @@ func createWindowForNote(file string, x, y, width, height int) {
 		}
 	})
 
+	saveRoutineRunning := false
+
+	buffer.ConnectAfter("insert-text", func(textBuffer *gtk.TextBuffer, textIter *gtk.TextIter, chars string) {
+		if !saveRoutineRunning {
+			saveTimer := time.NewTimer(time.Second * 3)
+			go func() {
+				saveRoutineRunning = true
+				<-saveTimer.C
+				//TODO dont save if note was deleted already
+				saveNote(file, textView)
+				saveRoutineRunning = false
+			}()
+		}
+	})
+
 	nodeLayout, gtkError := gtk.BoxNew(gtk.ORIENTATION_VERTICAL, 0)
 	util.LogAndExitOnError(gtkError)
 
@@ -177,6 +176,27 @@ func createWindowForNote(file string, x, y, width, height int) {
 
 	// Recursively show all widgets contained in this window.
 	win.ShowAll()
+}
+
+func saveNote(file string, textView *gtk.TextView) {
+	//TODO Following errors on which i now panic should probably inform the user about not being able to save.
+
+	currentNoteBuffer, bufferError := textView.GetBuffer()
+	if bufferError != nil {
+		panic(bufferError)
+	}
+
+	iterStart, iterEnd := currentNoteBuffer.GetBounds()
+	//TODO Check if I need the "Hidden chars"
+	textToSave, textError := currentNoteBuffer.GetText(iterStart, iterEnd, false)
+	if textError != nil {
+		panic(textError)
+	}
+
+	writeError := ioutil.WriteFile(file, []byte(textToSave), os.ModeType)
+	if writeError != nil {
+		panic(writeError)
+	}
 }
 
 //CreateNewNote generates a new notefile and opens the corresponding window.
