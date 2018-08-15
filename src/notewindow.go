@@ -121,15 +121,20 @@ func createWindowForNote(file string, x, y, width, height int) {
 		}
 	})
 
+	var saveTimer *time.Timer
 	saveRoutineRunning := false
 
 	buffer.ConnectAfter("insert-text", func(textBuffer *gtk.TextBuffer, textIter *gtk.TextIter, chars string) {
+		if saveTimer == nil {
+			saveTimer = time.NewTimer(time.Second * 3)
+		} else {
+			saveTimer.Reset(time.Second * 3)
+		}
+
 		if !saveRoutineRunning {
-			saveTimer := time.NewTimer(time.Second * 3)
 			go func() {
 				saveRoutineRunning = true
 				<-saveTimer.C
-				//TODO dont save if note was deleted already
 				saveNote(file, textView)
 				saveRoutineRunning = false
 			}()
