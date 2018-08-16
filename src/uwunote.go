@@ -1,4 +1,4 @@
-package main
+package src
 
 import (
 	"io/ioutil"
@@ -16,7 +16,7 @@ var (
 	notePath = filepath.FromSlash(os.Getenv("HOME") + string(os.PathSeparator) + "notes")
 )
 
-func main() {
+func Start() {
 	// Initialize GTK without parsing any command line arguments.
 	gtk.Init(nil)
 
