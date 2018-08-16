@@ -43,9 +43,12 @@ func createWindowForNote(file string, x, y, width, height int) {
 
 	deleteButton.SetLabel("Delete")
 	deleteButton.Connect("clicked", func() {
-		//TODO ask if the user really wants to delete the note?
-		os.Remove(file)
-		win.Destroy()
+		//TODO ask if the user really wants to delete the note?deleteBut
+		deleteDialog := gtk.MessageDialogNew(win, gtk.DIALOG_MODAL, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, "Are you sure, that you want to delete this note.")
+		if deleteDialog.Run() == gtk.RESPONSE_YES {
+			os.Remove(file)
+			win.Destroy()
+		}
 	})
 	deleteButton.SetHExpand(false)
 	deleteButton.SetHAlign(gtk.ALIGN_END)
