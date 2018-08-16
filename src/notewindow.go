@@ -43,6 +43,7 @@ func createWindowForNote(file string, x, y, width, height int) {
 
 	deleteButton.SetLabel("Delete")
 	deleteButton.Connect("clicked", func() {
+		//TODO ask if the user really wants to delete the note?
 		os.Remove(file)
 		win.Destroy()
 	})
@@ -121,24 +122,19 @@ func createWindowForNote(file string, x, y, width, height int) {
 		}
 	})
 
-	var saveTimer *time.Timer
-	saveRoutineRunning := false
+	//Creating the timer beforehand, so its never nil
+	saveTimer := time.NewTimer(0)
+	saveTimer.Stop()
+
+	go func() {
+		for {
+			<-saveTimer.C
+			saveNote(file, textView)
+		}
+	}()
 
 	buffer.ConnectAfter("insert-text", func(textBuffer *gtk.TextBuffer, textIter *gtk.TextIter, chars string) {
-		if saveTimer == nil {
-			saveTimer = time.NewTimer(time.Second * 3)
-		} else {
-			saveTimer.Reset(time.Second * 3)
-		}
-
-		if !saveRoutineRunning {
-			go func() {
-				saveRoutineRunning = true
-				<-saveTimer.C
-				saveNote(file, textView)
-				saveRoutineRunning = false
-			}()
-		}
+		saveTimer.Reset(time.Second * 3)
 	})
 
 	nodeLayout, gtkError := gtk.BoxNew(gtk.ORIENTATION_VERTICAL, 0)
