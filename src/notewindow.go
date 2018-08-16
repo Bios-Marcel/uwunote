@@ -15,7 +15,7 @@ import (
 )
 
 func createWindowForNote(file string, x, y, width, height int) {
-	deleteNote := make(chan bool)
+	deleteNoteChannel := make(chan bool)
 
 	//Error variable to be reused
 	var gtkError error
@@ -24,11 +24,6 @@ func createWindowForNote(file string, x, y, width, height int) {
 	// "destroy" signal to exit the GTK main loop when it is destroyed.
 	win, gtkError := gtk.WindowNew(gtk.WINDOW_TOPLEVEL)
 	util.LogAndExitOnError(gtkError)
-
-	// The app isn't killable for now.
-	/*win.Connect("destroy", func() {
-		gtk.MainQuit()
-	})*/
 
 	//TODO Is a title necessary at all?
 	win.SetTitle(file)
@@ -45,16 +40,7 @@ func createWindowForNote(file string, x, y, width, height int) {
 
 	deleteButton.SetLabel("Delete")
 	deleteButton.Connect("clicked", func() {
-		deleteDialog := gtk.MessageDialogNew(win, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, "Are you sure, that you want to delete this note.")
-		choice := deleteDialog.Run()
-		deleteDialog.Close()
-		if choice == gtk.RESPONSE_YES {
-			deleteNote <- true
-			os.Remove(file)
-			win.Close()
-		}
-
-		//TODO create new note if the last one was deleted?
+		deleteNote(file, win, deleteNoteChannel)
 	})
 	deleteButton.SetHExpand(false)
 	deleteButton.SetHAlign(gtk.ALIGN_END)
@@ -83,9 +69,13 @@ func createWindowForNote(file string, x, y, width, height int) {
 		//modifiers := gtk.AcceleratorGetDefaultModMask()
 
 		keyEvent := gdk.EventKeyNewFromEvent(event)
-		if keyEvent.KeyVal() == gdk.KEY_s {
-			if (keyEvent.State() & gdk.GDK_CONTROL_MASK) == gdk.GDK_CONTROL_MASK {
+		if (keyEvent.State() & gdk.GDK_CONTROL_MASK) == gdk.GDK_CONTROL_MASK {
+			if keyEvent.KeyVal() == gdk.KEY_s {
 				saveNote(file, textView)
+			} else if keyEvent.KeyVal() == gdk.KEY_d {
+				deleteNote(file, win, deleteNoteChannel)
+			} else if keyEvent.KeyVal() == gdk.KEY_n {
+				CreateNewNote(x+20, y+20, 300, 350)
 			}
 		}
 	})
@@ -142,7 +132,7 @@ func createWindowForNote(file string, x, y, width, height int) {
 			case <-saveTimer.C:
 				saveNote(file, textView)
 
-			case <-deleteNote:
+			case <-deleteNoteChannel:
 				break SaveLoop
 			}
 		}
@@ -213,6 +203,19 @@ func saveNote(file string, textView *gtk.TextView) {
 	if writeError != nil {
 		panic(writeError)
 	}
+}
+
+func deleteNote(file string, win *gtk.Window, deleteNoteChannel chan bool) {
+	deleteDialog := gtk.MessageDialogNew(win, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, "Are you sure, that you want to delete this note.")
+	choice := deleteDialog.Run()
+	deleteDialog.Close()
+	if choice == gtk.RESPONSE_YES {
+		deleteNoteChannel <- true
+		os.Remove(file)
+		win.Close()
+	}
+
+	//TODO create new note if the last one was deleted?
 }
 
 //CreateNewNote generates a new notefile and opens the corresponding window.
