@@ -32,16 +32,14 @@ func createWindowForNote(file string, x, y, width, height int) {
 	util.LogAndExitOnError(gtkError)
 
 	newButton.SetLabel("New")
-	newButton.Connect("clicked", func() { CreateNewNote(x+20, y+20, 300, 350) })
+	newButton.Connect("clicked", func() { CreateNote(x+20, y+20, 300, 350) })
 	newButton.SetHExpand(false)
 
 	deleteButton, gtkError := gtk.ButtonNew()
 	util.LogAndExitOnError(gtkError)
 
 	deleteButton.SetLabel("Delete")
-	deleteButton.Connect("clicked", func() {
-		deleteNote(file, win, deleteNoteChannel)
-	})
+	deleteButton.Connect("clicked", func() { deleteNote(file, win, deleteNoteChannel) })
 	deleteButton.SetHExpand(false)
 	deleteButton.SetHAlign(gtk.ALIGN_END)
 
@@ -60,25 +58,6 @@ func createWindowForNote(file string, x, y, width, height int) {
 
 	textView.SetVExpand(true)
 	textView.SetHExpand(true)
-
-	//TODO Currently saving is triggered manualy by pressing Ctrl + S, but later on it is supposedto be saving automatically.
-
-	textView.Connect("key_release_event", func(widget *gtk.TextView, event *gdk.Event) {
-		//Subtract default modifiers according to:
-		//https://developer.gnome.org/gtk3/stable/checklist-modifiers.html
-		//modifiers := gtk.AcceleratorGetDefaultModMask()
-
-		keyEvent := gdk.EventKeyNewFromEvent(event)
-		if (keyEvent.State() & gdk.GDK_CONTROL_MASK) == gdk.GDK_CONTROL_MASK {
-			if keyEvent.KeyVal() == gdk.KEY_s {
-				saveNote(file, textView)
-			} else if keyEvent.KeyVal() == gdk.KEY_d {
-				deleteNote(file, win, deleteNoteChannel)
-			} else if keyEvent.KeyVal() == gdk.KEY_n {
-				CreateNewNote(x+20, y+20, 300, 350)
-			}
-		}
-	})
 
 	//Wrapping the textView in a scrollpane, otherwise the window will expand instead
 	textViewScrollPane.Add(textView)
@@ -151,6 +130,23 @@ func createWindowForNote(file string, x, y, width, height int) {
 	win.SetTitlebar(topBar)
 	win.Add(nodeLayout)
 
+	win.Connect("key_release_event", func(window *gtk.Window, event *gdk.Event) {
+		//Subtract default modifiers according to:
+		//https://developer.gnome.org/gtk3/stable/checklist-modifiers.html
+		//modifiers := gtk.AcceleratorGetDefaultModMask()
+
+		keyEvent := gdk.EventKeyNewFromEvent(event)
+		if (keyEvent.State() & gdk.GDK_CONTROL_MASK) == gdk.GDK_CONTROL_MASK {
+			if keyEvent.KeyVal() == gdk.KEY_s {
+				saveNote(file, textView)
+			} else if keyEvent.KeyVal() == gdk.KEY_d {
+				deleteNote(file, win, deleteNoteChannel)
+			} else if keyEvent.KeyVal() == gdk.KEY_n {
+				CreateNote(x+20, y+20, 300, 350)
+			}
+		}
+	})
+
 	//Rebuilding behaviour from TYPE_HINT_DESKTOP
 	win.SetSkipTaskbarHint(true)
 	win.SetSkipPagerHint(true)
@@ -218,8 +214,8 @@ func deleteNote(file string, win *gtk.Window, deleteNoteChannel chan bool) {
 	//TODO create new note if the last one was deleted?
 }
 
-//CreateNewNote generates a new notefile and opens the corresponding window.
-func CreateNewNote(x, y, width, height int) {
+//CreateNote generates a new notefile and opens the corresponding window.
+func CreateNote(x, y, width, height int) {
 	fileName := uuid.Must(uuid.NewV4())
 	newNotePath := notePath + string(os.PathSeparator) + fileName.String()
 	os.Create(newNotePath)

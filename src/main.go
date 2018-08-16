@@ -39,7 +39,7 @@ func generateNoteWindows() {
 
 	if len(files) == 0 {
 		log.Println("Generating a initial note.")
-		CreateNewNote(0, 0, 300, 350)
+		CreateNote(0, 0, 300, 350)
 	} else {
 		log.Println("Creating windows for existing notes.")
 		for _, fileInfo := range files {
