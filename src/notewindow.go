@@ -11,8 +11,8 @@ import (
 	"github.com/gotk3/gotk3/gtk"
 	uuid "github.com/satori/go.uuid"
 
-	"github.com/bios-marcel/uwunote/src/config"
-	"github.com/bios-marcel/uwunote/src/util"
+	"github.com/Bios-Marcel/uwuNote/src/config"
+	"github.com/Bios-Marcel/uwuNote/src/util"
 )
 
 func createWindowForNote(file string, x, y, width, height int) {
