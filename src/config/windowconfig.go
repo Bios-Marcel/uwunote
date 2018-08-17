@@ -13,7 +13,7 @@ import (
 var (
 	windowConfigPath = configPath + string(os.PathSeparator) + "windows.json"
 	//Configuration contains the positions and sizes for all notes
-	configuration = WindowConfig{}
+	windowConfiguration = WindowConfig{}
 )
 
 //WindowConfig contains a map of WindowData entries in a map
@@ -37,22 +37,22 @@ func LoadWindowConfiguration() {
 	if openError == nil || os.IsExist(openError) {
 		defer file.Close()
 		decoder := json.NewDecoder(file)
-		windowConfigLoadError := decoder.Decode(&configuration)
+		windowConfigLoadError := decoder.Decode(&windowConfiguration)
 
 		if windowConfigLoadError != io.EOF {
 			util.LogAndExitOnError(windowConfigLoadError)
 		}
 	}
 
-	if configuration.Data == nil {
+	if windowConfiguration.Data == nil {
 		//Creating an empty map to prevent nil pointer references
-		configuration.Data = make(map[string]WindowData)
+		windowConfiguration.Data = make(map[string]WindowData)
 	}
 }
 
 //PersistWindowConfiguration saves the current window configuration to its iven path
 func PersistWindowConfiguration() {
-	windowConfigurationJSON, _ := json.Marshal(&configuration)
+	windowConfigurationJSON, _ := json.Marshal(&windowConfiguration)
 	writeError := ioutil.WriteFile(windowConfigPath, windowConfigurationJSON, os.ModePerm)
 	//TODO Better way?
 	util.LogAndExitOnError(writeError)
@@ -60,13 +60,13 @@ func PersistWindowConfiguration() {
 
 //GetWindowDataForFile retrieves the window-config entry for the given file
 func GetWindowDataForFile(file string) (WindowData, bool) {
-	data, exists := configuration.Data[file]
+	data, exists := windowConfiguration.Data[file]
 	return data, exists
 }
 
 //SetWindowDataForFile sets coordinates and size in the window-config for the given file
 func SetWindowDataForFile(file string, x, y, width, height int) {
-	configuration.Data[file] = WindowData{
+	windowConfiguration.Data[file] = WindowData{
 		X:      x,
 		Y:      y,
 		Width:  width,

@@ -21,6 +21,8 @@ func createWindowForNote(file string, x, y, width, height int) {
 	//Error variable to be reused
 	var gtkError error
 
+	appConfig := config.GetAppConfig()
+
 	// Create a new toplevel window and connect it to the
 	// "destroy" signal to exit the GTK main loop when it is destroyed.
 	win, gtkError := gtk.WindowNew(gtk.WINDOW_TOPLEVEL)
@@ -40,7 +42,7 @@ func createWindowForNote(file string, x, y, width, height int) {
 	util.LogAndExitOnError(gtkError)
 
 	deleteButton.SetLabel("Delete")
-	deleteButton.Connect("clicked", func() { deleteNote(file, win, deleteNoteChannel) })
+	deleteButton.Connect("clicked", func() { deleteNote(&appConfig, file, win, deleteNoteChannel) })
 	deleteButton.SetHExpand(false)
 	deleteButton.SetHAlign(gtk.ALIGN_END)
 
@@ -69,30 +71,40 @@ func createWindowForNote(file string, x, y, width, height int) {
 	fileContent, _ := ioutil.ReadFile(file)
 	buffer.SetText(string(fileContent))
 
-	registerAutoIndentListener(buffer)
+	if appConfig.AutoIndent {
+		registerAutoIndentListener(buffer)
+	}
 
-	//Creating the timer beforehand, so its never nil
-	saveTimer := time.NewTimer(0)
-	saveTimer.Stop()
+	if appConfig.AutoSaveAfterTyping {
+		//Creating the timer beforehand, so its never nil
+		saveTimer := time.NewTimer(0)
+		saveTimer.Stop()
 
-	go func() {
-	SaveLoop:
-		for {
-			select {
-			case <-saveTimer.C:
-				//has to be run in gtk thread in order to show error dialogs
-				glib.IdleAdd(func() { saveNote(win, file, buffer) })
+		go func() {
+		SaveLoop:
+			for {
+				select {
+				case <-saveTimer.C:
+					//has to be run in gtk thread in order to show error dialogs
+					glib.IdleAdd(func() { saveNote(win, file, buffer) })
 
-			case <-deleteNoteChannel:
-				break SaveLoop
+				case <-deleteNoteChannel:
+					break SaveLoop
+				}
 			}
-		}
-	}()
+		}()
 
-	const saveTimerDuration = time.Second * 3
-	buffer.ConnectAfter("insert-text", func(textBuffer *gtk.TextBuffer, textIter *gtk.TextIter, chars string) {
-		saveTimer.Reset(saveTimerDuration)
-	})
+		var delay int
+		if appConfig.AutoSaveAfterTypingDelay < 0 {
+			delay = 0
+		} else {
+			delay = appConfig.AutoSaveAfterTypingDelay
+		}
+		saveTimerDuration := time.Millisecond * time.Duration(delay)
+		buffer.ConnectAfter("insert-text", func(textBuffer *gtk.TextBuffer, textIter *gtk.TextIter, chars string) {
+			saveTimer.Reset(saveTimerDuration)
+		})
+	}
 
 	nodeLayout, gtkError := gtk.BoxNew(gtk.ORIENTATION_VERTICAL, 0)
 	util.LogAndExitOnError(gtkError)
@@ -113,7 +125,7 @@ func createWindowForNote(file string, x, y, width, height int) {
 			if keyEvent.KeyVal() == gdk.KEY_s {
 				saveNote(win, file, buffer)
 			} else if keyEvent.KeyVal() == gdk.KEY_d {
-				deleteNote(file, win, deleteNoteChannel)
+				deleteNote(&appConfig, file, win, deleteNoteChannel)
 			} else if keyEvent.KeyVal() == gdk.KEY_n {
 				CreateNote(x+20, y+20, 300, 350)
 			}
@@ -213,15 +225,19 @@ func saveNote(window *gtk.Window, file string, textBuffer *gtk.TextBuffer) {
 	}
 }
 
-func deleteNote(file string, win *gtk.Window, deleteNoteChannel chan bool) {
-	deleteDialog := gtk.MessageDialogNew(win, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, "Are you sure, that you want to delete this note.")
-	choice := deleteDialog.Run()
-	deleteDialog.Close()
-	if choice == gtk.RESPONSE_YES {
-		deleteNoteChannel <- true
-		os.Remove(file)
-		win.Close()
+func deleteNote(appConfig *config.AppConfig, file string, win *gtk.Window, deleteNoteChannel chan bool) {
+	if appConfig.AskBeforeNoteDeletion {
+		deleteDialog := gtk.MessageDialogNew(win, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, "Are you sure, that you want to delete this note.")
+		choice := deleteDialog.Run()
+		deleteDialog.Close()
+		if choice != gtk.RESPONSE_YES {
+			return
+		}
 	}
+
+	deleteNoteChannel <- true
+	os.Remove(file)
+	win.Close()
 
 	//TODO create new note if the last one was deleted?
 }

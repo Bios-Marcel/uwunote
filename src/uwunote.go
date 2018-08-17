@@ -21,10 +21,19 @@ func Start() {
 	// Initialize GTK without parsing any command line arguments.
 	gtk.Init(nil)
 
+	createNeccessaryDirectories()
+
+	config.LoadAppConfig()
+
 	generateNoteWindows()
 
 	// Begin executing the GTK main loop. This blocks until gtk.MainQuit() is run.
 	gtk.Main()
+}
+
+func createNeccessaryDirectories() {
+	os.MkdirAll(notePath, os.ModePerm)
+	config.CreateNeccessaryFiles()
 }
 
 //Creates a window for every node inside of the notePath
