@@ -28,15 +28,24 @@ To build the app you simply run these commands:
 
 ```bash
 cd $GOPATH
-go get github.com/bios-marcel/uwunote
-cd src/github.com/bios-marcel/uwunote
+go get github.com/Bios-Marcel/uwuNote
+cd src/github.com/Bios-Marcel/uwuNote
 go get ./...
 go build
 ```
 
-You might stil need some dependencies:
+You need the development packages of following libraries:
+* GTK+3 (3.12 and later)
+* GDK 3 (3.12 and later)
+* GLib 2 (2.36 and later)
+* Cairo (1.10 and later)
 
-TODO - List dependencies
+You can most likely install those via your systems packagemanager.
+
+## Configuration
+
+Configuration is currently done by editing a JSON file, check the wiki for more information:
+https://github.com/Bios-Marcel/uwuNote/wiki/Configuration
 
 ## Contribute
 
