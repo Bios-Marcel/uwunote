@@ -16,6 +16,7 @@ var (
 	notePath = filepath.FromSlash(os.Getenv("HOME") + string(os.PathSeparator) + "notes")
 )
 
+//Start initializes gtk and creates a window for every note.
 func Start() {
 	// Initialize GTK without parsing any command line arguments.
 	gtk.Init(nil)
