@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gotk3/gotk3/gdk"
+	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
 	uuid "github.com/satori/go.uuid"
 
@@ -68,6 +69,84 @@ func createWindowForNote(file string, x, y, width, height int) {
 	fileContent, _ := ioutil.ReadFile(file)
 	buffer.SetText(string(fileContent))
 
+	registerAutoIndentListener(buffer)
+
+	//Creating the timer beforehand, so its never nil
+	saveTimer := time.NewTimer(0)
+	saveTimer.Stop()
+
+	go func() {
+	SaveLoop:
+		for {
+			select {
+			case <-saveTimer.C:
+				//has to be run in gtk thread in order to show error dialogs
+				glib.IdleAdd(func() { saveNote(win, file, buffer) })
+
+			case <-deleteNoteChannel:
+				break SaveLoop
+			}
+		}
+	}()
+
+	const saveTimerDuration = time.Second * 3
+	buffer.ConnectAfter("insert-text", func(textBuffer *gtk.TextBuffer, textIter *gtk.TextIter, chars string) {
+		saveTimer.Reset(saveTimerDuration)
+	})
+
+	nodeLayout, gtkError := gtk.BoxNew(gtk.ORIENTATION_VERTICAL, 0)
+	util.LogAndExitOnError(gtkError)
+
+	nodeLayout.Add(textViewScrollPane)
+	nodeLayout.SetVExpand(true)
+
+	win.SetTitlebar(topBar)
+	win.Add(nodeLayout)
+
+	win.Connect("key_release_event", func(window *gtk.Window, event *gdk.Event) {
+		//Subtract default modifiers according to:
+		//https://developer.gnome.org/gtk3/stable/checklist-modifiers.html
+		//modifiers := gtk.AcceleratorGetDefaultModMask()
+
+		keyEvent := gdk.EventKeyNewFromEvent(event)
+		if (keyEvent.State() & gdk.GDK_CONTROL_MASK) == gdk.GDK_CONTROL_MASK {
+			if keyEvent.KeyVal() == gdk.KEY_s {
+				saveNote(win, file, buffer)
+			} else if keyEvent.KeyVal() == gdk.KEY_d {
+				deleteNote(file, win, deleteNoteChannel)
+			} else if keyEvent.KeyVal() == gdk.KEY_n {
+				CreateNote(x+20, y+20, 300, 350)
+			}
+		}
+	})
+
+	//Rebuilding behaviour from TYPE_HINT_DESKTOP
+	win.SetSkipTaskbarHint(true)
+	win.SetSkipPagerHint(true)
+	win.SetKeepBelow(true)
+	win.Stick()
+
+	//Making the window unminimizable
+	win.Connect("window-state-event", func(window *gtk.Window, event *gdk.Event) {
+		windowEvent := gdk.EventWindowStateNewFromEvent(event)
+		newWindowState := windowEvent.NewWindowState()
+
+		if (newWindowState & gdk.WINDOW_STATE_ICONIFIED) == gdk.WINDOW_STATE_ICONIFIED {
+			window.Present()
+		}
+	})
+
+	noteName := filepath.Base(file)
+	registerWindowStatePersister(noteName, win)
+
+	win.Move(x, y)
+	win.SetDefaultSize(width, height)
+
+	// Recursively show all widgets contained in this window.
+	win.ShowAll()
+}
+
+func registerAutoIndentListener(buffer *gtk.TextBuffer) {
 	buffer.ConnectAfter("insert-text", func(textBuffer *gtk.TextBuffer, textIter *gtk.TextIter, chars string) {
 		if chars != "\r\n" && chars != "\n" {
 			return
@@ -100,104 +179,37 @@ func createWindowForNote(file string, x, y, width, height int) {
 		}
 	})
 
-	//Creating the timer beforehand, so its never nil
-	saveTimer := time.NewTimer(0)
-	saveTimer.Stop()
+}
 
-	go func() {
-	SaveLoop:
-		for {
-			select {
-			case <-saveTimer.C:
-				saveNote(file, textView)
-
-			case <-deleteNoteChannel:
-				break SaveLoop
-			}
-		}
-	}()
-
-	buffer.ConnectAfter("insert-text", func(textBuffer *gtk.TextBuffer, textIter *gtk.TextIter, chars string) {
-		saveTimer.Reset(time.Second * 3)
-	})
-
-	nodeLayout, gtkError := gtk.BoxNew(gtk.ORIENTATION_VERTICAL, 0)
-	util.LogAndExitOnError(gtkError)
-
-	nodeLayout.Add(textViewScrollPane)
-	nodeLayout.SetVExpand(true)
-
-	win.SetTitlebar(topBar)
-	win.Add(nodeLayout)
-
-	win.Connect("key_release_event", func(window *gtk.Window, event *gdk.Event) {
-		//Subtract default modifiers according to:
-		//https://developer.gnome.org/gtk3/stable/checklist-modifiers.html
-		//modifiers := gtk.AcceleratorGetDefaultModMask()
-
-		keyEvent := gdk.EventKeyNewFromEvent(event)
-		if (keyEvent.State() & gdk.GDK_CONTROL_MASK) == gdk.GDK_CONTROL_MASK {
-			if keyEvent.KeyVal() == gdk.KEY_s {
-				saveNote(file, textView)
-			} else if keyEvent.KeyVal() == gdk.KEY_d {
-				deleteNote(file, win, deleteNoteChannel)
-			} else if keyEvent.KeyVal() == gdk.KEY_n {
-				CreateNote(x+20, y+20, 300, 350)
-			}
-		}
-	})
-
-	//Rebuilding behaviour from TYPE_HINT_DESKTOP
-	win.SetSkipTaskbarHint(true)
-	win.SetSkipPagerHint(true)
-	win.SetKeepBelow(true)
-	win.Stick()
-
-	//Making the window unminimizable
-	win.Connect("window-state-event", func(window *gtk.Window, event *gdk.Event) {
-		windowEvent := gdk.EventWindowStateNewFromEvent(event)
-		newWindowState := windowEvent.NewWindowState()
-
-		if (newWindowState & gdk.WINDOW_STATE_ICONIFIED) == gdk.WINDOW_STATE_ICONIFIED {
-			window.Present()
-		}
-	})
-
-	win.Move(x, y)
-	win.SetDefaultSize(width, height)
-
-	win.Connect("configure-event", func(window *gtk.Window, event *gdk.Event) {
+func registerWindowStatePersister(identifier string, window *gtk.Window) {
+	window.Connect("configure-event", func(window *gtk.Window, event *gdk.Event) {
 		windowX, windowY := window.GetPosition()
 		windowWidth, windowHeight := window.GetSize()
 
-		noteName := filepath.Base(file)
-		config.SetWindowDataForFile(noteName, windowX, windowY, windowWidth, windowHeight)
+		config.SetWindowDataForFile(identifier, windowX, windowY, windowWidth, windowHeight)
 
 		config.PersistWindowConfiguration()
 	})
-
-	// Recursively show all widgets contained in this window.
-	win.ShowAll()
 }
 
-func saveNote(file string, textView *gtk.TextView) {
-	//TODO Following errors on which i now panic should probably inform the user about not being able to save.
-
-	currentNoteBuffer, bufferError := textView.GetBuffer()
-	if bufferError != nil {
-		panic(bufferError)
+func saveNote(window *gtk.Window, file string, textBuffer *gtk.TextBuffer) {
+	displaySaveError := func() {
+		dialog := gtk.MessageDialogNew(window, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, "Error saving your note")
+		dialog.Run()
+		dialog.Close()
 	}
 
-	iterStart, iterEnd := currentNoteBuffer.GetBounds()
+	iterStart, iterEnd := textBuffer.GetBounds()
 	//TODO Check if I need the "Hidden chars"
-	textToSave, textError := currentNoteBuffer.GetText(iterStart, iterEnd, false)
+	textToSave, textError := textBuffer.GetText(iterStart, iterEnd, false)
+
 	if textError != nil {
-		panic(textError)
+		displaySaveError()
 	}
 
 	writeError := ioutil.WriteFile(file, []byte(textToSave), os.ModeType)
 	if writeError != nil {
-		panic(writeError)
+		displaySaveError()
 	}
 }
 
