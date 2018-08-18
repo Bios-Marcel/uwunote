@@ -30,15 +30,15 @@ func createWindowForNote(file string, x, y, width, height int) {
 	win, gtkError := gtk.WindowNew(gtk.WINDOW_TOPLEVEL)
 	util.LogAndExitOnError(gtkError)
 
-	//TODO Is a title necessary at all?
-	win.SetTitle(file)
+	//setting the title in order to allow the user to distinguish the windows in his os gui or so
+	win.SetTitle("UwU Note - " + file)
 
 	newButton, gtkError := gtk.ButtonNew()
 	util.LogAndExitOnError(gtkError)
 
 	newButton.SetLabel("New")
 	newButton.Connect("clicked", func() {
-		CreateNoteGUI(x+defaultXOffsetNewNote, y+defaultYOffsetNewNote, defaultWidthNewNote, defaultHeightNewNote)
+		CreateNoteGUI(x+defaultXOffsetNewNote, y+defaultYOffsetNewNote, defaultWidthNewNote, defaultHeightNewNote, win)
 	})
 	newButton.SetHExpand(false)
 
@@ -132,7 +132,7 @@ func createWindowForNote(file string, x, y, width, height int) {
 			} else if keyEvent.KeyVal() == gdk.KEY_d {
 				deleteNoteGUI(&appConfig, file, win, killSaveRoutineChannel)
 			} else if keyEvent.KeyVal() == gdk.KEY_n {
-				CreateNoteGUI(x+defaultXOffsetNewNote, y+defaultYOffsetNewNote, defaultWidthNewNote, defaultHeightNewNote)
+				CreateNoteGUI(x+defaultXOffsetNewNote, y+defaultYOffsetNewNote, defaultWidthNewNote, defaultHeightNewNote, win)
 			} else if keyEvent.KeyVal() == gdk.KEY_o {
 				config.OpenAppConfig()
 			}
@@ -213,14 +213,13 @@ func registerWindowStatePersister(identifier string, window *gtk.Window) {
 
 func saveNoteGUI(window *gtk.Window, file string, textBuffer *gtk.TextBuffer) {
 	displaySaveError := func() {
-		dialog := gtk.MessageDialogNew(window, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, "Error saving your note")
+		dialog := gtk.MessageDialogNew(window, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, "Error saving note.")
 		dialog.Run()
-		dialog.Close()
+		dialog.Destroy()
 	}
 
 	iterStart, iterEnd := textBuffer.GetBounds()
-	//TODO Check if I need the "Hidden chars"
-	textToSave, textError := textBuffer.GetText(iterStart, iterEnd, false)
+	textToSave, textError := textBuffer.GetText(iterStart, iterEnd, true)
 
 	if textError != nil {
 		displaySaveError()
@@ -236,7 +235,7 @@ func deleteNoteGUI(appConfig *config.AppConfig, file string, win *gtk.Window, ki
 	if appConfig.AskBeforeNoteDeletion {
 		deleteDialog := gtk.MessageDialogNew(win, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, "Are you sure, that you want to delete this note.")
 		choice := deleteDialog.Run()
-		deleteDialog.Close()
+		deleteDialog.Destroy()
 		if choice != gtk.RESPONSE_YES {
 			return
 		}
@@ -247,20 +246,23 @@ func deleteNoteGUI(appConfig *config.AppConfig, file string, win *gtk.Window, ki
 		killSaveRoutineChannel <- true
 		win.Close()
 	} else {
-		//TODO Show error dialog on failure
-		util.LogAndExitOnError(deleteError)
+		dialog := gtk.MessageDialogNew(win, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, "Error deleting note.")
+		dialog.Run()
+		dialog.Destroy()
 	}
 
 	//TODO create new note if the last one was deleted?
 }
 
 //CreateNoteGUI generates a new notefile and opens the corresponding window.
-func CreateNoteGUI(x, y, width, height int) {
+func CreateNoteGUI(x, y, width, height int, nullableParent *gtk.Window) {
 	newNotePath, createError := CreateNote()
+
 	if createError == nil {
 		createWindowForNote(*newNotePath, x, y, width, height)
 	} else {
-		//TODO Show error dialog on failure
-		util.LogAndExitOnError(createError)
+		dialog := gtk.MessageDialogNew(nullableParent, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, "Error creating a new note.")
+		dialog.Run()
+		dialog.Destroy()
 	}
 }
