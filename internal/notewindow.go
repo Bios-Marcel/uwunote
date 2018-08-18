@@ -1,22 +1,24 @@
 package internal
 
 import (
-	"io/ioutil"
-	"os"
 	"path/filepath"
 	"time"
 
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
-	uuid "github.com/satori/go.uuid"
 
 	"github.com/Bios-Marcel/uwuNote/internal/config"
 	"github.com/Bios-Marcel/uwuNote/internal/util"
 )
 
 func createWindowForNote(file string, x, y, width, height int) {
-	deleteNoteChannel := make(chan bool)
+	const defaultXOffsetNewNote = 20
+	const defaultYOffsetNewNote = 20
+	const defaultWidthNewNote = 300
+	const defaultHeightNewNote = 350
+
+	killSaveRoutineChannel := make(chan bool)
 
 	//Error variable to be reused
 	var gtkError error
@@ -35,22 +37,24 @@ func createWindowForNote(file string, x, y, width, height int) {
 	util.LogAndExitOnError(gtkError)
 
 	newButton.SetLabel("New")
-	newButton.Connect("clicked", func() { CreateNote(x+20, y+20, 300, 350) })
+	newButton.Connect("clicked", func() {
+		CreateNoteGUI(x+defaultXOffsetNewNote, y+defaultYOffsetNewNote, defaultWidthNewNote, defaultHeightNewNote)
+	})
 	newButton.SetHExpand(false)
 
 	deleteButton, gtkError := gtk.ButtonNew()
 	util.LogAndExitOnError(gtkError)
 
 	deleteButton.SetLabel("Delete")
-	deleteButton.Connect("clicked", func() { deleteNote(&appConfig, file, win, deleteNoteChannel) })
+	deleteButton.Connect("clicked", func() { deleteNoteGUI(&appConfig, file, win, killSaveRoutineChannel) })
 	deleteButton.SetHExpand(false)
 	deleteButton.SetHAlign(gtk.ALIGN_END)
 
-	topBar, gtkError := gtk.HeaderBarNew()
+	titleBar, gtkError := gtk.HeaderBarNew()
 	util.LogAndExitOnError(gtkError)
 
-	topBar.PackStart(newButton)
-	topBar.PackEnd(deleteButton)
+	titleBar.PackStart(newButton)
+	titleBar.PackEnd(deleteButton)
 
 	var hAdjustment, vAdjustment *gtk.Adjustment
 	textViewScrollPane, gtkError := gtk.ScrolledWindowNew(hAdjustment, vAdjustment)
@@ -68,7 +72,8 @@ func createWindowForNote(file string, x, y, width, height int) {
 	buffer, gtkError := textView.GetBuffer()
 	util.LogAndExitOnError(gtkError)
 
-	fileContent, _ := ioutil.ReadFile(file)
+	fileContent, loadError := LoadNote(file)
+	util.LogAndExitOnError(loadError)
 	buffer.SetText(string(fileContent))
 
 	if appConfig.AutoIndent {
@@ -86,9 +91,9 @@ func createWindowForNote(file string, x, y, width, height int) {
 				select {
 				case <-saveTimer.C:
 					//has to be run in gtk thread in order to show error dialogs
-					glib.IdleAdd(func() { saveNote(win, file, buffer) })
+					glib.IdleAdd(func() { saveNoteGUI(win, file, buffer) })
 
-				case <-deleteNoteChannel:
+				case <-killSaveRoutineChannel:
 					break SaveLoop
 				}
 			}
@@ -112,22 +117,24 @@ func createWindowForNote(file string, x, y, width, height int) {
 	nodeLayout.Add(textViewScrollPane)
 	nodeLayout.SetVExpand(true)
 
-	win.SetTitlebar(topBar)
+	win.SetTitlebar(titleBar)
 	win.Add(nodeLayout)
 
 	win.Connect("key_release_event", func(window *gtk.Window, event *gdk.Event) {
-		//Subtract default modifiers according to:
+		//TODO Subtract default modifiers according to:
 		//https://developer.gnome.org/gtk3/stable/checklist-modifiers.html
 		//modifiers := gtk.AcceleratorGetDefaultModMask()
 
 		keyEvent := gdk.EventKeyNewFromEvent(event)
 		if (keyEvent.State() & gdk.GDK_CONTROL_MASK) == gdk.GDK_CONTROL_MASK {
 			if keyEvent.KeyVal() == gdk.KEY_s {
-				saveNote(win, file, buffer)
+				saveNoteGUI(win, file, buffer)
 			} else if keyEvent.KeyVal() == gdk.KEY_d {
-				deleteNote(&appConfig, file, win, deleteNoteChannel)
+				deleteNoteGUI(&appConfig, file, win, killSaveRoutineChannel)
 			} else if keyEvent.KeyVal() == gdk.KEY_n {
-				CreateNote(x+20, y+20, 300, 350)
+				CreateNoteGUI(x+defaultXOffsetNewNote, y+defaultYOffsetNewNote, defaultWidthNewNote, defaultHeightNewNote)
+			} else if keyEvent.KeyVal() == gdk.KEY_o {
+				config.OpenAppConfig()
 			}
 		}
 	})
@@ -138,7 +145,7 @@ func createWindowForNote(file string, x, y, width, height int) {
 	win.SetKeepBelow(true)
 	win.Stick()
 
-	//Making the window unminimizable
+	//HACK Making the window effectively unminimizable, but doesn't reliably work
 	win.Connect("window-state-event", func(window *gtk.Window, event *gdk.Event) {
 		windowEvent := gdk.EventWindowStateNewFromEvent(event)
 		newWindowState := windowEvent.NewWindowState()
@@ -169,16 +176,16 @@ func registerAutoIndentListener(buffer *gtk.TextBuffer) {
 		textIter.BackwardChars(textIter.GetLineOffset())
 		amountOfTabs := 0
 		for {
-			if textIter.GetChar() == '\t' {
-				amountOfTabs++
-				if !textIter.EndsLine() {
-					textIter.ForwardChar()
-				} else {
-					break
-				}
-			} else {
+			if textIter.GetChar() != '\t' {
 				break
 			}
+
+			amountOfTabs++
+			if textIter.EndsLine() {
+				break
+			}
+
+			textIter.ForwardChar()
 		}
 
 		//Insert same amounts of tabs from previous line onto next line
@@ -204,7 +211,7 @@ func registerWindowStatePersister(identifier string, window *gtk.Window) {
 	})
 }
 
-func saveNote(window *gtk.Window, file string, textBuffer *gtk.TextBuffer) {
+func saveNoteGUI(window *gtk.Window, file string, textBuffer *gtk.TextBuffer) {
 	displaySaveError := func() {
 		dialog := gtk.MessageDialogNew(window, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, "Error saving your note")
 		dialog.Run()
@@ -219,13 +226,13 @@ func saveNote(window *gtk.Window, file string, textBuffer *gtk.TextBuffer) {
 		displaySaveError()
 	}
 
-	writeError := ioutil.WriteFile(file, []byte(textToSave), os.ModeType)
+	writeError := SaveNote(file, []byte(textToSave))
 	if writeError != nil {
 		displaySaveError()
 	}
 }
 
-func deleteNote(appConfig *config.AppConfig, file string, win *gtk.Window, deleteNoteChannel chan bool) {
+func deleteNoteGUI(appConfig *config.AppConfig, file string, win *gtk.Window, killSaveRoutineChannel chan bool) {
 	if appConfig.AskBeforeNoteDeletion {
 		deleteDialog := gtk.MessageDialogNew(win, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, "Are you sure, that you want to delete this note.")
 		choice := deleteDialog.Run()
@@ -235,17 +242,25 @@ func deleteNote(appConfig *config.AppConfig, file string, win *gtk.Window, delet
 		}
 	}
 
-	deleteNoteChannel <- true
-	os.Remove(file)
-	win.Close()
+	deleteError := DeleteNote(file)
+	if deleteError == nil {
+		killSaveRoutineChannel <- true
+		win.Close()
+	} else {
+		//TODO Show error dialog on failure
+		util.LogAndExitOnError(deleteError)
+	}
 
 	//TODO create new note if the last one was deleted?
 }
 
-//CreateNote generates a new notefile and opens the corresponding window.
-func CreateNote(x, y, width, height int) {
-	fileName := uuid.Must(uuid.NewV4())
-	newNotePath := notePath + string(os.PathSeparator) + fileName.String()
-	os.Create(newNotePath)
-	createWindowForNote(newNotePath, x, y, width, height)
+//CreateNoteGUI generates a new notefile and opens the corresponding window.
+func CreateNoteGUI(x, y, width, height int) {
+	newNotePath, createError := CreateNote()
+	if createError == nil {
+		createWindowForNote(*newNotePath, x, y, width, height)
+	} else {
+		//TODO Show error dialog on failure
+		util.LogAndExitOnError(createError)
+	}
 }

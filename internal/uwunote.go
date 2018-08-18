@@ -4,16 +4,10 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path/filepath"
 
 	"github.com/gotk3/gotk3/gtk"
 
 	"github.com/Bios-Marcel/uwuNote/internal/config"
-)
-
-var (
-	//Will be customizable at some point
-	notePath = filepath.FromSlash(os.Getenv("HOME") + string(os.PathSeparator) + "notes")
 )
 
 //Start initializes gtk and creates a window for every note.
@@ -21,14 +15,18 @@ func Start() {
 	// Initialize GTK without parsing any command line arguments.
 	gtk.Init(nil)
 
+	startInternal()
+
+	// Begin executing the GTK main loop. This blocks until gtk.MainQuit() is run.
+	gtk.Main()
+}
+
+func startInternal() {
 	createNeccessaryDirectories()
 
 	config.LoadAppConfig()
 
 	generateNoteWindows()
-
-	// Begin executing the GTK main loop. This blocks until gtk.MainQuit() is run.
-	gtk.Main()
 }
 
 func createNeccessaryDirectories() {
@@ -36,7 +34,7 @@ func createNeccessaryDirectories() {
 	config.CreateNeccessaryFiles()
 }
 
-//Creates a window for every node inside of the notePath
+//Creates a window for every note inside of the notePath
 func generateNoteWindows() {
 	files, err := ioutil.ReadDir(notePath)
 
@@ -49,7 +47,7 @@ func generateNoteWindows() {
 
 	if len(files) == 0 {
 		log.Println("Generating a initial note.")
-		CreateNote(0, 0, 300, 350)
+		CreateNoteGUI(0, 0, 300, 350)
 	} else {
 		log.Println("Creating windows for existing notes.")
 		for _, fileInfo := range files {

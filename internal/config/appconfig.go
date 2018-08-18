@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/skratchdot/open-golang/open"
+
 	"github.com/Bios-Marcel/uwuNote/internal/util"
 )
 
@@ -53,4 +55,9 @@ func LoadAppConfig() {
 //GetAppConfig returns a copy off the apps configuration
 func GetAppConfig() AppConfig {
 	return appConfiguration
+}
+
+//OpenAppConfig opens the configuration file with its given application
+func OpenAppConfig() {
+	open.Run(appConfigPath)
 }
