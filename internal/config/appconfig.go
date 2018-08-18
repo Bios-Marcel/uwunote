@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/Bios-Marcel/uwuNote/src/util"
+	"github.com/Bios-Marcel/uwuNote/internal/util"
 )
 
 //AppConfig contains all possible configuration values

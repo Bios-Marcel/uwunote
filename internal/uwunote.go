@@ -1,4 +1,4 @@
-package src
+package internal
 
 import (
 	"io/ioutil"
@@ -8,7 +8,7 @@ import (
 
 	"github.com/gotk3/gotk3/gtk"
 
-	"github.com/Bios-Marcel/uwuNote/src/config"
+	"github.com/Bios-Marcel/uwuNote/internal/config"
 )
 
 var (

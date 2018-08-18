@@ -34,13 +34,20 @@ go get ./...
 go build
 ```
 
+### Linux
+
 You need the development packages of following libraries:
+
 * GTK+3 (3.12 and later)
 * GDK 3 (3.12 and later)
 * GLib 2 (2.36 and later)
 * Cairo (1.10 and later)
 
 You can most likely install those via your systems packagemanager.
+
+### Windows
+
+TODO
 
 ## Configuration
 

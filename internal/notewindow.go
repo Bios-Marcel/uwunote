@@ -1,4 +1,4 @@
-package src
+package internal
 
 import (
 	"io/ioutil"
@@ -11,8 +11,8 @@ import (
 	"github.com/gotk3/gotk3/gtk"
 	uuid "github.com/satori/go.uuid"
 
-	"github.com/Bios-Marcel/uwuNote/src/config"
-	"github.com/Bios-Marcel/uwuNote/src/util"
+	"github.com/Bios-Marcel/uwuNote/internal/config"
+	"github.com/Bios-Marcel/uwuNote/internal/util"
 )
 
 func createWindowForNote(file string, x, y, width, height int) {
