@@ -2,7 +2,7 @@
 
 First of all, I really hate making up names, so `UwU Note` is all you get.
 
-## What's it?
+## What's it
 
 It's a simple note-taking app. Notes stick to your desktop, you can create new ones and delete existing ones.
 Every note has it's own window, which saves it's coordinates and size.
@@ -52,7 +52,7 @@ TODO
 ## Configuration
 
 Configuration is currently done by editing a JSON file, check the wiki for more information:
-https://github.com/Bios-Marcel/uwuNote/wiki/Configuration
+[https://github.com/Bios-Marcel/uwuNote/wiki/Configuration](https://github.com/Bios-Marcel/uwuNote/wiki/Configuration)
 
 ## Contribute
 
