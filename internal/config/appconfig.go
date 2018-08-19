@@ -5,6 +5,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	"github.com/skratchdot/open-golang/open"
 
@@ -19,10 +20,12 @@ type AppConfig struct {
 	AutoSaveAfterTypingDelay int
 
 	AutoIndent bool
+
+	NoteDirectory string
 }
 
 var (
-	appConfigPath    = configPath + string(os.PathSeparator) + "app.json"
+	appConfigPath    = filepath.Join(configPath, "app.json")
 	appConfiguration = AppConfig{
 		AskBeforeNoteDeletion: true,
 
@@ -30,6 +33,8 @@ var (
 		AutoSaveAfterTypingDelay: 3000,
 
 		AutoIndent: true,
+
+		NoteDirectory: filepath.Join(os.Getenv("HOME"), "notes"),
 	}
 )
 

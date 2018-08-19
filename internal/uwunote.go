@@ -22,16 +22,12 @@ func Start() {
 }
 
 func startInternal() {
-	createNeccessaryDirectories()
-
+	config.CreateNeccessaryFiles()
 	config.LoadAppConfig()
 
-	generateNoteWindows()
-}
-
-func createNeccessaryDirectories() {
 	os.MkdirAll(notePath, os.ModePerm)
-	config.CreateNeccessaryFiles()
+
+	generateNoteWindows()
 }
 
 //Creates a window for every note inside of the notePath

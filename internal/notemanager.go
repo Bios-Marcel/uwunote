@@ -3,14 +3,15 @@ package internal
 import (
 	"io/ioutil"
 	"os"
-	"path/filepath"
 
 	uuid "github.com/satori/go.uuid"
+
+	"github.com/Bios-Marcel/uwuNote/internal/config"
 )
 
 var (
 	//Will be customizable at some point
-	notePath = filepath.FromSlash(os.Getenv("HOME") + string(os.PathSeparator) + "notes")
+	notePath = config.GetAppConfig().NoteDirectory
 )
 
 //LoadNote loads the content of a note and returns an error on failure.
