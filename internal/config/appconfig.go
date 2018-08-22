@@ -34,7 +34,7 @@ var (
 
 		AutoIndent: true,
 
-		NoteDirectory: filepath.Join(os.Getenv("HOME"), "notes"),
+		NoteDirectory: filepath.Join(util.HomeDir, "notes"),
 	}
 )
 
