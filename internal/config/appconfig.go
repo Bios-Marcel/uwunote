@@ -9,7 +9,7 @@ import (
 
 	"github.com/skratchdot/open-golang/open"
 
-	"github.com/Bios-Marcel/uwuNote/internal/util"
+	"github.com/Bios-Marcel/uwunote/internal/util"
 )
 
 //AppConfig contains all possible configuration values

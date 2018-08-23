@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/Bios-Marcel/uwuNote/internal/util"
+	"github.com/Bios-Marcel/uwunote/internal/util"
 )
 
 var (

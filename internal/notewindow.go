@@ -8,8 +8,8 @@ import (
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
 
-	"github.com/Bios-Marcel/uwuNote/internal/config"
-	"github.com/Bios-Marcel/uwuNote/internal/util"
+	"github.com/Bios-Marcel/uwunote/internal/config"
+	"github.com/Bios-Marcel/uwunote/internal/util"
 )
 
 func createWindowForNote(file string, x, y, width, height int) {

@@ -7,7 +7,7 @@ import (
 
 	"github.com/gotk3/gotk3/gtk"
 
-	"github.com/Bios-Marcel/uwuNote/internal/config"
+	"github.com/Bios-Marcel/uwunote/internal/config"
 )
 
 //Start initializes gtk and creates a window for every note.

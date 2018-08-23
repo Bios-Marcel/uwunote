@@ -28,8 +28,8 @@ To build the app you simply run these commands:
 
 ```bash
 cd $GOPATH
-go get github.com/Bios-Marcel/uwuNote
-cd src/github.com/Bios-Marcel/uwuNote
+go get github.com/Bios-Marcel/uwunote
+cd src/github.com/Bios-Marcel/uwunote
 go get ./...
 go build
 ```
@@ -52,7 +52,7 @@ TODO
 ## Configuration
 
 Configuration is currently done by editing a JSON file, check the wiki for more information:
-[https://github.com/Bios-Marcel/uwuNote/wiki/Configuration](https://github.com/Bios-Marcel/uwuNote/wiki/Configuration)
+[https://github.com/Bios-Marcel/uwunote/wiki/Configuration](https://github.com/Bios-Marcel/uwunote/wiki/Configuration)
 
 ## Contribute
 
