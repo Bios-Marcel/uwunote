@@ -33,10 +33,11 @@ func DeleteNote(file string) error {
 func CreateNote() (*string, error) {
 	fileName := uuid.Must(uuid.NewV4())
 	newNotePath := notePath + string(os.PathSeparator) + fileName.String()
-	_, createError := os.Create(newNotePath)
+	newFile, createError := os.Create(newNotePath)
 	if createError != nil {
 		return nil, createError
 	}
+	defer newFile.Close()
 
 	return &newNotePath, nil
 }
