@@ -13,11 +13,12 @@ import (
 	"github.com/UwUNote/uwunote/internal/util"
 )
 
+const defaultWidthNewNote = 300
+const defaultHeightNewNote = 350
+
 func createWindowForNote(file string, x, y, width, height int) {
 	const defaultXOffsetNewNote = 20
 	const defaultYOffsetNewNote = 20
-	const defaultWidthNewNote = 300
-	const defaultHeightNewNote = 350
 
 	killSaveRoutineChannel := make(chan bool)
 
@@ -39,7 +40,8 @@ func createWindowForNote(file string, x, y, width, height int) {
 
 	newButton.SetLabel("New")
 	newButton.Connect("clicked", func() {
-		CreateNoteGUI(x+defaultXOffsetNewNote, y+defaultYOffsetNewNote, defaultWidthNewNote, defaultHeightNewNote, win)
+		currentX, currentY := win.GetPosition()
+		CreateNoteGUI(currentX+defaultXOffsetNewNote, currentY+defaultYOffsetNewNote, defaultWidthNewNote, defaultHeightNewNote, win)
 	})
 	newButton.SetHExpand(false)
 
@@ -133,7 +135,8 @@ func createWindowForNote(file string, x, y, width, height int) {
 			} else if keyEvent.KeyVal() == gdk.KEY_d {
 				deleteNoteGUI(&appConfig, file, win, killSaveRoutineChannel)
 			} else if keyEvent.KeyVal() == gdk.KEY_n {
-				CreateNoteGUI(x+defaultXOffsetNewNote, y+defaultYOffsetNewNote, defaultWidthNewNote, defaultHeightNewNote, win)
+				currentX, currentY := win.GetPosition()
+				CreateNoteGUI(currentX+defaultXOffsetNewNote, currentY+defaultYOffsetNewNote, defaultWidthNewNote, defaultHeightNewNote, win)
 			} else if keyEvent.KeyVal() == gdk.KEY_o {
 				config.OpenAppConfig()
 			}
@@ -255,6 +258,11 @@ func deleteNoteGUI(appConfig *config.AppConfig, file string, win *gtk.Window, ki
 	}
 
 	//TODO create new note if the last one was deleted?
+}
+
+//CreateNoteGUIWithDefaults generates a new notefile and opens the corresponding window.
+func CreateNoteGUIWithDefaults() {
+	CreateNoteGUI(0, 0, defaultWidthNewNote, defaultHeightNewNote, nil)
 }
 
 //CreateNoteGUI generates a new notefile and opens the corresponding window.
