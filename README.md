@@ -42,6 +42,7 @@ You need the development packages of following libraries:
 * GDK 3 (3.12 and later)
 * GLib 2 (2.36 and later)
 * Cairo (1.10 and later)
+* libappindicator
 
 You can most likely install those via your systems packagemanager.
 
