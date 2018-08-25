@@ -22,6 +22,8 @@ type AppConfig struct {
 	AutoIndent bool
 
 	NoteDirectory string
+
+	ShowTrayIcon bool
 }
 
 var (
@@ -35,6 +37,8 @@ var (
 		AutoIndent: true,
 
 		NoteDirectory: filepath.Join(util.HomeDir, "notes"),
+
+		ShowTrayIcon: true,
 	}
 )
 

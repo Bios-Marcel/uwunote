@@ -16,18 +16,27 @@ import (
 
 //Start initializes gtk and creates a window for every note.
 func Start() {
-	systray.Run(
-		func() {
-			systemTrayRun()
+	config.CreateNeccessaryFiles()
+	config.LoadAppConfig()
 
-			//Only on linux (and some others) gtk will be used, therefore we needed init gtk on linux.
-			if runtime.GOOS == "windows" || runtime.GOOS == "darwin" {
-				startAndInitGtk()
-			} else {
-				start()
-			}
-		},
-		func() {})
+	os.MkdirAll(notePath, os.ModePerm)
+
+	if config.GetAppConfig().ShowTrayIcon {
+		systray.Run(
+			func() {
+				systemTrayRun()
+
+				//Only on linux (and some others) gtk will be used, therefore we needed init gtk on linux.
+				if runtime.GOOS == "windows" || runtime.GOOS == "darwin" {
+					startAndInitGtk()
+				} else {
+					start()
+				}
+			},
+			func() {})
+	} else {
+		startAndInitGtk()
+	}
 }
 
 func systemTrayRun() {
@@ -54,11 +63,6 @@ func systemTrayRun() {
 }
 
 func start() {
-	config.CreateNeccessaryFiles()
-	config.LoadAppConfig()
-
-	os.MkdirAll(notePath, os.ModePerm)
-
 	glib.IdleAdd(generateNoteWindows)
 }
 
