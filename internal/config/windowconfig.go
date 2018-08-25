@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/UwUNote /uwunote/internal/util"
+	"github.com/UwUNote/uwunote/internal/util"
 )
 
 var (

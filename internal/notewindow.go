@@ -9,8 +9,8 @@ import (
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
 
-	"github.com/UwUNote /uwunote/internal/config"
-	"github.com/UwUNote /uwunote/internal/util"
+	"github.com/UwUNote/uwunote/internal/config"
+	"github.com/UwUNote/uwunote/internal/util"
 )
 
 func createWindowForNote(file string, x, y, width, height int) {

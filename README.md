@@ -28,8 +28,8 @@ To build the app you simply run these commands:
 
 ```bash
 cd $GOPATH
-go get github.com/UwUNote /uwunote
-cd src/github.com/UwUNote /uwunote
+go get github.com/UwUNote/uwunote
+cd src/github.com/UwUNote/uwunote
 go get ./...
 go build
 ```
@@ -52,7 +52,7 @@ TODO
 ## Configuration
 
 Configuration is currently done by editing a JSON file, check the wiki for more information:
-[https://github.com/UwUNote /uwunote/wiki/Configuration](https://github.com/UwUNote /uwunote/wiki/Configuration)
+[https://github.com/UwUNote/uwunote/wiki/Configuration](https://github.com/UwUNote/uwunote/wiki/Configuration)
 
 ## Contribute
 
