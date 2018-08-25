@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"path/filepath"
 	"time"
 
@@ -8,8 +9,8 @@ import (
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
 
-	"github.com/Bios-Marcel/uwunote/internal/config"
-	"github.com/Bios-Marcel/uwunote/internal/util"
+	"github.com/UwUNote /uwunote/internal/config"
+	"github.com/UwUNote /uwunote/internal/util"
 )
 
 func createWindowForNote(file string, x, y, width, height int) {
@@ -212,8 +213,9 @@ func registerWindowStatePersister(identifier string, window *gtk.Window) {
 }
 
 func saveNoteGUI(window *gtk.Window, file string, textBuffer *gtk.TextBuffer) {
-	displaySaveError := func() {
-		dialog := gtk.MessageDialogNew(window, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, "Error saving note.")
+	displaySaveError := func(err error) {
+		message := fmt.Sprintf("Error saving note '%s' (%s).", file, err.Error())
+		dialog := gtk.MessageDialogNew(window, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, message)
 		dialog.Run()
 		dialog.Destroy()
 	}
@@ -222,12 +224,12 @@ func saveNoteGUI(window *gtk.Window, file string, textBuffer *gtk.TextBuffer) {
 	textToSave, textError := textBuffer.GetText(iterStart, iterEnd, true)
 
 	if textError != nil {
-		displaySaveError()
+		displaySaveError(textError)
 	}
 
 	writeError := SaveNote(file, []byte(textToSave))
 	if writeError != nil {
-		displaySaveError()
+		displaySaveError(writeError)
 	}
 }
 
@@ -246,7 +248,8 @@ func deleteNoteGUI(appConfig *config.AppConfig, file string, win *gtk.Window, ki
 		killSaveRoutineChannel <- true
 		win.Close()
 	} else {
-		dialog := gtk.MessageDialogNew(win, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, "Error deleting note.")
+		message := fmt.Sprintf("Error deleting note '%s' (%s).", file, deleteError.Error())
+		dialog := gtk.MessageDialogNew(win, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, message)
 		dialog.Run()
 		dialog.Destroy()
 	}
@@ -261,7 +264,8 @@ func CreateNoteGUI(x, y, width, height int, nullableParent *gtk.Window) {
 	if createError == nil {
 		createWindowForNote(*newNotePath, x, y, width, height)
 	} else {
-		dialog := gtk.MessageDialogNew(nullableParent, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, "Error creating a new note.")
+		message := fmt.Sprintf("Error creating new note (%s).", createError.Error())
+		dialog := gtk.MessageDialogNew(nullableParent, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, message)
 		dialog.Run()
 		dialog.Destroy()
 	}

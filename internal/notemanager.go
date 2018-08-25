@@ -6,7 +6,7 @@ import (
 
 	uuid "github.com/satori/go.uuid"
 
-	"github.com/Bios-Marcel/uwunote/internal/config"
+	"github.com/UwUNote /uwunote/internal/config"
 )
 
 var (

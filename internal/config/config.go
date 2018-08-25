@@ -4,7 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/Bios-Marcel/uwunote/internal/util"
+	"github.com/UwUNote /uwunote/internal/util"
 )
 
 var (

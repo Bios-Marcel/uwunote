@@ -1,6 +1,6 @@
 package main
 
-import "github.com/Bios-Marcel/uwunote/internal"
+import "github.com/UwUNote /uwunote/internal"
 
 func main() {
 	internal.Start()
