@@ -109,7 +109,7 @@ func createWindowForNote(file string, x, y, width, height int) {
 			delay = appConfig.AutoSaveAfterTypingDelay
 		}
 		saveTimerDuration := time.Millisecond * time.Duration(delay)
-		buffer.ConnectAfter("insert-text", func(textBuffer *gtk.TextBuffer, textIter *gtk.TextIter, chars string) {
+		buffer.ConnectAfter("changed", func(textBuffer *gtk.TextBuffer) {
 			saveTimer.Reset(saveTimerDuration)
 		})
 	}
