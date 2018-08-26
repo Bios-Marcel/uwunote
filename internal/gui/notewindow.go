@@ -124,10 +124,6 @@ func CreateWindowForNote(file string, x, y, width, height int) {
 	win.Add(nodeLayout)
 
 	win.Connect("key_release_event", func(window *gtk.Window, event *gdk.Event) {
-		//TODO Subtract default modifiers according to:
-		//https://developer.gnome.org/gtk3/stable/checklist-modifiers.html
-		//modifiers := gtk.AcceleratorGetDefaultModMask()
-
 		keyEvent := gdk.EventKeyNewFromEvent(event)
 		if (keyEvent.State() & gdk.GDK_CONTROL_MASK) == gdk.GDK_CONTROL_MASK {
 			if keyEvent.KeyVal() == gdk.KEY_s {
@@ -256,8 +252,6 @@ func deleteNoteGUI(appConfig *config.AppConfig, file string, win *gtk.Window, ki
 		dialog.Run()
 		dialog.Destroy()
 	}
-
-	//TODO create new note if the last one was deleted?
 }
 
 //CreateNoteGUIWithDefaults generates a new notefile and opens the corresponding window.
