@@ -56,7 +56,10 @@ func systemTrayRun() {
 				config.OpenAppConfig()
 
 			case <-quitItem.ClickedCh:
-				gtk.MainQuit()
+				glib.IdleAdd(func() {
+					gtk.MainQuit()
+					os.Exit(0)
+				})
 			}
 		}
 	}()
