@@ -3,7 +3,7 @@ apt-run: &ref_0
   command: >-
     sudo apt-get update
 
-    sudo apt-get -y install libglib2.0-dev libgtk-3-dev libappindicator-dev
+    sudo apt-get -y install libglib2.0-dev libgtk-3-dev libappindicator3-dev
 version: 2
 jobs:
   build:
