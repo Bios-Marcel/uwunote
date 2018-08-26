@@ -1,0 +1,16 @@
+apt-run: &ref_0
+  name: Install Linux dependecies via apt.
+  command: >-
+    apt-get update
+    apt-get -y install libgtk-3-dev libappindicator-dev
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.10
+
+    working_directory: /go/src/github.com/UwUNote/uwunote
+    steps:
+      - checkout
+      - run: go get -v -t -d ./...
+      - run: go test -v ./...
