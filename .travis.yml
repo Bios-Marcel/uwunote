@@ -4,7 +4,11 @@ go:
   - "1.10"
 
 before_install:
+  - stty cols 80
   - wget https://github.com/macports/macports-base/releases/download/v2.5.3/MacPorts-2.5.3-10.13-HighSierra.pkg -O ports.pkg
   - sudo installer -pkg ports.pkg -target /
   - sudo /opt/local/bin/port -d selfupdate
   - sudo /opt/local/bin/port -N install gtk3
+  - sudo /opt/local/bin/port load dbus
+  - sudo /opt/local/bin/port select --set python python27
+  - sudo /opt/local/bin/port select --set python2 python27
