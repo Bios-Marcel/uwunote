@@ -4,11 +4,10 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"runtime"
-
-	"github.com/gotk3/gotk3/glib"
+	"path/filepath"
 
 	"github.com/getlantern/systray"
+	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
 
 	"github.com/UwUNote/uwunote/internal/config"
@@ -22,18 +21,7 @@ func Start() {
 	os.MkdirAll(notePath, os.ModePerm)
 
 	if config.GetAppConfig().ShowTrayIcon {
-		systray.Run(
-			func() {
-				systemTrayRun()
-
-				//Only on linux (and some others) gtk will be used, therefore we needed init gtk on linux.
-				if runtime.GOOS == "windows" || runtime.GOOS == "darwin" {
-					startAndInitGtk()
-				} else {
-					start()
-				}
-			},
-			func() {})
+		startWithTrayIcon()
 	} else {
 		startAndInitGtk()
 	}
@@ -65,10 +53,7 @@ func systemTrayRun() {
 	}()
 }
 
-func start() {
-	glib.IdleAdd(generateNoteWindows)
-}
-
+//startAndInitGtk initializes gtk, invokes `start` and triggers the gtk mainloop.
 func startAndInitGtk() {
 	// Initialize GTK without parsing any command line arguments.
 	gtk.Init(nil)
@@ -77,6 +62,10 @@ func startAndInitGtk() {
 
 	// Begin executing the GTK main loop. This blocks until gtk.MainQuit() is run.
 	gtk.Main()
+}
+
+func start() {
+	glib.IdleAdd(generateNoteWindows)
 }
 
 //Creates a window for every note inside of the notePath
@@ -103,7 +92,7 @@ func generateNoteWindows() {
 			fileName := fileInfo.Name()
 			configForWindow, exists := config.GetWindowDataForFile(fileName)
 
-			pathToNote := notePath + string(os.PathSeparator) + fileName
+			pathToNote := filepath.Join(notePath, fileName)
 			if exists {
 				createWindowForNote(pathToNote, configForWindow.X, configForWindow.Y, configForWindow.Width, configForWindow.Height)
 			} else {
