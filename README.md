@@ -1,8 +1,9 @@
 # UwU Note
 
-| linux | [![CircleCI](https://circleci.com/gh/UwUNote/uwunote/tree/master.svg?style=svg)](https://circleci.com/gh/UwUNote/uwunote/tree/master) |
+| linux | [![CircleCI - Linux](https://circleci.com/gh/UwUNote/uwunote/tree/master.svg?style=svg)](https://circleci.com/gh/UwUNote/uwunote/tree/master) |
 | - | - |
-| windows | TODO |
+| **darwin** | [![TravisCI - Mac OS](https://travis-ci.org/UwUNote/uwunote.svg?branch=master)](https://travis-ci.org/UwUNote/uwunote) |
+| **windows** | **TODO** |
 
 First of all, I really hate making up names, so `UwU Note` is all you get.
 
