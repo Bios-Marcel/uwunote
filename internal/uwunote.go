@@ -11,6 +11,8 @@ import (
 	"github.com/gotk3/gotk3/gtk"
 
 	"github.com/UwUNote/uwunote/internal/config"
+	"github.com/UwUNote/uwunote/internal/data"
+	"github.com/UwUNote/uwunote/internal/gui"
 	"github.com/UwUNote/uwunote/internal/util"
 )
 
@@ -19,7 +21,7 @@ func Start() {
 	config.CreateNeccessaryFiles()
 	util.LogAndExitOnError(config.LoadAppConfig())
 
-	os.MkdirAll(notePath, os.ModePerm)
+	os.MkdirAll(data.NotePath, os.ModePerm)
 
 	if config.GetAppConfig().ShowTrayIcon {
 		startWithTrayIcon()
@@ -29,7 +31,7 @@ func Start() {
 }
 
 func systemTrayRun() {
-	systray.SetIcon(Icon)
+	systray.SetIcon(gui.AppIcon)
 	newNoteItem := systray.AddMenuItem("New note", "Creates a new note")
 	settingsItem := systray.AddMenuItem("Settings", "Opens the settings")
 	systray.AddSeparator()
@@ -39,7 +41,7 @@ func systemTrayRun() {
 		for {
 			select {
 			case <-newNoteItem.ClickedCh:
-				glib.IdleAdd(CreateNoteGUIWithDefaults)
+				glib.IdleAdd(gui.CreateNoteGUIWithDefaults)
 
 			case <-settingsItem.ClickedCh:
 				config.OpenAppConfig()
@@ -71,7 +73,7 @@ func start() {
 
 //Creates a window for every note inside of the notePath
 func generateNoteWindows() {
-	files, err := ioutil.ReadDir(notePath)
+	files, err := ioutil.ReadDir(data.NotePath)
 
 	if err != nil {
 		log.Fatal("Error reading notes.")
@@ -83,7 +85,7 @@ func generateNoteWindows() {
 
 	if len(files) == 0 {
 		log.Println("Generating a initial note.")
-		CreateNoteGUIWithDefaults()
+		gui.CreateNoteGUIWithDefaults()
 	} else {
 		log.Println("Creating windows for existing notes.")
 		for _, fileInfo := range files {
@@ -94,11 +96,11 @@ func generateNoteWindows() {
 			fileName := fileInfo.Name()
 			configForWindow, exists := config.GetWindowDataForFile(fileName)
 
-			pathToNote := filepath.Join(notePath, fileName)
+			pathToNote := filepath.Join(data.NotePath, fileName)
 			if exists {
-				createWindowForNote(pathToNote, configForWindow.X, configForWindow.Y, configForWindow.Width, configForWindow.Height)
+				gui.CreateWindowForNote(pathToNote, configForWindow.X, configForWindow.Y, configForWindow.Width, configForWindow.Height)
 			} else {
-				createWindowForNote(pathToNote, appConfig.DefaultNoteX, appConfig.DefaultNoteY, appConfig.DefaultNoteWidth, appConfig.DefaultNoteHeight)
+				gui.CreateWindowForNote(pathToNote, appConfig.DefaultNoteX, appConfig.DefaultNoteY, appConfig.DefaultNoteWidth, appConfig.DefaultNoteHeight)
 			}
 		}
 	}

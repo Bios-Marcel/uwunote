@@ -1,4 +1,4 @@
-package internal
+package data
 
 import (
 	"io/ioutil"
@@ -9,10 +9,8 @@ import (
 	"github.com/UwUNote/uwunote/internal/config"
 )
 
-var (
-	//Will be customizable at some point
-	notePath = config.GetAppConfig().NoteDirectory
-)
+//NotePath is the path at which notes are saved
+var NotePath = config.GetAppConfig().NoteDirectory
 
 //LoadNote loads the content of a note and returns an error on failure.
 func LoadNote(file string) ([]byte, error) {
@@ -32,7 +30,7 @@ func DeleteNote(file string) error {
 //CreateNote generates a new notefile and returns an error on failure.
 func CreateNote() (*string, error) {
 	fileName := uuid.Must(uuid.NewV4())
-	newNotePath := notePath + string(os.PathSeparator) + fileName.String()
+	newNotePath := NotePath + string(os.PathSeparator) + fileName.String()
 	newFile, createError := os.Create(newNotePath)
 	if createError != nil {
 		return nil, createError

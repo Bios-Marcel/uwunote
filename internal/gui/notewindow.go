@@ -1,4 +1,4 @@
-package internal
+package gui
 
 import (
 	"fmt"
@@ -10,10 +10,11 @@ import (
 	"github.com/gotk3/gotk3/gtk"
 
 	"github.com/UwUNote/uwunote/internal/config"
+	"github.com/UwUNote/uwunote/internal/data"
 	"github.com/UwUNote/uwunote/internal/util"
 )
 
-func createWindowForNote(file string, x, y, width, height int) {
+func CreateWindowForNote(file string, x, y, width, height int) {
 	const defaultXOffsetNewNote = 20
 	const defaultYOffsetNewNote = 20
 
@@ -72,7 +73,7 @@ func createWindowForNote(file string, x, y, width, height int) {
 	buffer, gtkError := textView.GetBuffer()
 	util.LogAndExitOnError(gtkError)
 
-	fileContent, loadError := LoadNote(file)
+	fileContent, loadError := data.LoadNote(file)
 	util.LogAndExitOnError(loadError)
 	buffer.SetText(string(fileContent))
 
@@ -227,7 +228,7 @@ func saveNoteGUI(window *gtk.Window, file string, textBuffer *gtk.TextBuffer) {
 		displaySaveError(textError)
 	}
 
-	writeError := SaveNote(file, []byte(textToSave))
+	writeError := data.SaveNote(file, []byte(textToSave))
 	if writeError != nil {
 		displaySaveError(writeError)
 	}
@@ -243,7 +244,7 @@ func deleteNoteGUI(appConfig *config.AppConfig, file string, win *gtk.Window, ki
 		}
 	}
 
-	deleteError := DeleteNote(file)
+	deleteError := data.DeleteNote(file)
 	if deleteError == nil {
 		killSaveRoutineChannel <- true
 		win.Close()
@@ -265,10 +266,10 @@ func CreateNoteGUIWithDefaults() {
 
 //CreateNoteGUI generates a new notefile and opens the corresponding window.
 func CreateNoteGUI(x, y, width, height int, nullableParent *gtk.Window) {
-	newNotePath, createError := CreateNote()
+	newNotePath, createError := data.CreateNote()
 
 	if createError == nil {
-		createWindowForNote(*newNotePath, x, y, width, height)
+		CreateWindowForNote(*newNotePath, x, y, width, height)
 	} else {
 		message := fmt.Sprintf("Error creating new note (%s).", createError.Error())
 		dialog := gtk.MessageDialogNew(nullableParent, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, message)
