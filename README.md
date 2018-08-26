@@ -12,12 +12,14 @@ First of all, I really hate making up names, so `UwU Note` is all you get.
 It's a simple note-taking app. Notes stick to your desktop, you can create new ones and delete existing ones.
 Every note has it's own window, which saves it's coordinates and size.
 
+![Demo Image](https://i.imgur.com/tM3fhoK.jpg)
+
 ## The Future
 
 For the future i have planned some stuff:
 
-* Cloud synchronization (Different Services)
-* An android app
+* Cloud synchronization via different services
+* [An android app](https://github.com/UwUNote/uwunote-android)
 * Markdown support
 
 ## Installation
@@ -26,6 +28,18 @@ As this is a work in progress, there are currently no installation instructions,
 Theretically you should be able to build it on every platform supporting GTk3+.
 
 Official binaries are gonna follow at some point, maybe even a snap or flatpak.
+
+As of now, you can do the followig:
+
+```bash
+cd $GOPATH
+go get github.com/UwUNote/uwunote
+cd src/github.com/UwUNote/uwunote
+go get ./...
+go install
+```
+
+which will put a ready to use binary called `uwunote` into `$GOPATH/bin`.
 
 ## Building
 
@@ -39,17 +53,24 @@ go get ./...
 go build
 ```
 
-### Linux
-
 You need the development packages of following libraries:
 
 * GTK+3 (3.12 and later)
 * GDK 3 (3.12 and later)
 * GLib 2 (2.36 and later)
 * Cairo (1.10 and later)
+
+### Linux
+
+In addition to the default dependencies, linux needs additional dependencies:
+
 * libappindicator
 
-You can most likely install those via your systems packagemanager.
+You can most likely install all dependenxies via your systems packagemanager.
+
+### Mac OS
+
+TODO
 
 ### Windows
 
@@ -62,4 +83,4 @@ Configuration is currently done by editing a JSON file, check the wiki for more 
 
 ## Contribute
 
-Feel free to create issues or create pull requests.
+Feel free to create issues or create pull requests. Issues may also request features or just be questions.
