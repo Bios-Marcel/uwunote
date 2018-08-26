@@ -13,9 +13,6 @@ import (
 	"github.com/UwUNote/uwunote/internal/util"
 )
 
-const defaultWidthNewNote = 300
-const defaultHeightNewNote = 350
-
 func createWindowForNote(file string, x, y, width, height int) {
 	const defaultXOffsetNewNote = 20
 	const defaultYOffsetNewNote = 20
@@ -41,7 +38,7 @@ func createWindowForNote(file string, x, y, width, height int) {
 	newButton.SetLabel("New")
 	newButton.Connect("clicked", func() {
 		currentX, currentY := win.GetPosition()
-		CreateNoteGUI(currentX+defaultXOffsetNewNote, currentY+defaultYOffsetNewNote, defaultWidthNewNote, defaultHeightNewNote, win)
+		CreateNoteGUI(currentX+defaultXOffsetNewNote, currentY+defaultYOffsetNewNote, appConfig.DefaultNoteWidth, appConfig.DefaultNoteHeight, win)
 	})
 	newButton.SetHExpand(false)
 
@@ -136,7 +133,7 @@ func createWindowForNote(file string, x, y, width, height int) {
 				deleteNoteGUI(&appConfig, file, win, killSaveRoutineChannel)
 			} else if keyEvent.KeyVal() == gdk.KEY_n {
 				currentX, currentY := win.GetPosition()
-				CreateNoteGUI(currentX+defaultXOffsetNewNote, currentY+defaultYOffsetNewNote, defaultWidthNewNote, defaultHeightNewNote, win)
+				CreateNoteGUI(currentX+defaultXOffsetNewNote, currentY+defaultYOffsetNewNote, appConfig.DefaultNoteWidth, appConfig.DefaultNoteHeight, win)
 			} else if keyEvent.KeyVal() == gdk.KEY_o {
 				config.OpenAppConfig()
 			}
@@ -262,7 +259,8 @@ func deleteNoteGUI(appConfig *config.AppConfig, file string, win *gtk.Window, ki
 
 //CreateNoteGUIWithDefaults generates a new notefile and opens the corresponding window.
 func CreateNoteGUIWithDefaults() {
-	CreateNoteGUI(0, 0, defaultWidthNewNote, defaultHeightNewNote, nil)
+	appConfig := config.GetAppConfig()
+	CreateNoteGUI(appConfig.DefaultNoteX, appConfig.DefaultNoteY, appConfig.DefaultNoteWidth, appConfig.DefaultNoteHeight, nil)
 }
 
 //CreateNoteGUI generates a new notefile and opens the corresponding window.

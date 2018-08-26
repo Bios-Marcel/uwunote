@@ -24,6 +24,11 @@ type AppConfig struct {
 	NoteDirectory string
 
 	ShowTrayIcon bool
+
+	DefaultNoteWidth  int
+	DefaultNoteHeight int
+	DefaultNoteX      int
+	DefaultNoteY      int
 }
 
 var (
@@ -39,26 +44,35 @@ var (
 		NoteDirectory: filepath.Join(util.HomeDir, "notes"),
 
 		ShowTrayIcon: true,
+
+		DefaultNoteWidth:  300,
+		DefaultNoteHeight: 350,
+		DefaultNoteX:      0,
+		DefaultNoteY:      0,
 	}
 )
 
 //LoadAppConfig loads the configuration or creates a default one if none is present
-func LoadAppConfig() {
+func LoadAppConfig() error {
 	file, openError := os.Open(appConfigPath)
 	if openError != nil && os.IsNotExist(openError) {
 		appConfigurationJSON, _ := json.MarshalIndent(&appConfiguration, "", "\t")
 		writeError := ioutil.WriteFile(appConfigPath, appConfigurationJSON, os.ModePerm)
-		//TODO Better way?
-		util.LogAndExitOnError(writeError)
+
+		if writeError != nil {
+			return writeError
+		}
 	} else if openError == nil || os.IsExist(openError) {
 		defer file.Close()
 		decoder := json.NewDecoder(file)
 		appConfigLoadError := decoder.Decode(&appConfiguration)
 
-		if appConfigLoadError != io.EOF {
-			util.LogAndExitOnError(appConfigLoadError)
+		if appConfigLoadError != nil && appConfigLoadError != io.EOF {
+			return appConfigLoadError
 		}
 	}
+
+	return nil
 }
 
 //GetAppConfig returns a copy off the apps configuration

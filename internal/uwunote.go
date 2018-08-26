@@ -11,12 +11,13 @@ import (
 	"github.com/gotk3/gotk3/gtk"
 
 	"github.com/UwUNote/uwunote/internal/config"
+	"github.com/UwUNote/uwunote/internal/util"
 )
 
 //Start initializes gtk and creates a window for every note.
 func Start() {
 	config.CreateNeccessaryFiles()
-	config.LoadAppConfig()
+	util.LogAndExitOnError(config.LoadAppConfig())
 
 	os.MkdirAll(notePath, os.ModePerm)
 
@@ -78,10 +79,11 @@ func generateNoteWindows() {
 	}
 
 	config.LoadWindowConfiguration()
+	appConfig := config.GetAppConfig()
 
 	if len(files) == 0 {
 		log.Println("Generating a initial note.")
-		CreateNoteGUI(0, 0, 300, 350, nil)
+		CreateNoteGUIWithDefaults()
 	} else {
 		log.Println("Creating windows for existing notes.")
 		for _, fileInfo := range files {
@@ -96,7 +98,7 @@ func generateNoteWindows() {
 			if exists {
 				createWindowForNote(pathToNote, configForWindow.X, configForWindow.Y, configForWindow.Width, configForWindow.Height)
 			} else {
-				createWindowForNote(pathToNote, 0, 0, 300, 350)
+				createWindowForNote(pathToNote, appConfig.DefaultNoteX, appConfig.DefaultNoteY, appConfig.DefaultNoteWidth, appConfig.DefaultNoteHeight)
 			}
 		}
 	}
