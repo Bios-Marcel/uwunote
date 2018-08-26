@@ -14,6 +14,8 @@ import (
 	"github.com/UwUNote/uwunote/internal/util"
 )
 
+//CreateWindowForNote creates a window at the given position and with the
+//given dimensions, that contains the content of the passed file.
 func CreateWindowForNote(file string, x, y, width, height int) {
 	const defaultXOffsetNewNote = 20
 	const defaultYOffsetNewNote = 20
