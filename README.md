@@ -66,7 +66,7 @@ In addition to the default dependencies, linux needs additional dependencies:
 
 * libappindicator
 
-You can most likely install all dependenxies via your systems packagemanager.
+You can most likely install all dependencies via your systems packagemanager.
 
 ### Mac OS
 
@@ -74,7 +74,7 @@ TODO
 
 ### Windows
 
-TODO
+[https://github.com/UwUNote/uwunote/issues/1#issuecomment-414850043](https://github.com/UwUNote/uwunote/issues/1#issuecomment-414850043)
 
 ## Configuration
 
