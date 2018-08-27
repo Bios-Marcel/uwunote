@@ -152,7 +152,7 @@ func CreateWindowForNote(file string, x, y, width, height int) {
 		newWindowState := windowEvent.NewWindowState()
 
 		if (newWindowState & gdk.WINDOW_STATE_ICONIFIED) == gdk.WINDOW_STATE_ICONIFIED {
-			window.Present()
+			glib.TimeoutAdd(125, window.Present)
 		}
 	})
 
