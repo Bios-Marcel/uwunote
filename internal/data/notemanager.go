@@ -39,3 +39,22 @@ func CreateNote() (*string, error) {
 
 	return &newNotePath, nil
 }
+
+//GetAmountOfNotes returns the amount of existing notes or `0` and an error.
+//Only top level files are counted.
+func GetAmountOfNotes() (int, error) {
+	files, err := ioutil.ReadDir(NotePath)
+
+	if err != nil {
+		return 0, err
+	}
+
+	amountOfFilesOnTopLevel := len(files)
+	for _, fileInfo := range files {
+		if fileInfo.IsDir() {
+			amountOfFilesOnTopLevel--
+		}
+	}
+
+	return amountOfFilesOnTopLevel, nil
+}

@@ -2,6 +2,7 @@ package gui
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -246,6 +247,31 @@ func deleteNoteGUI(appConfig *config.AppConfig, file string, win *gtk.Window, ki
 	if deleteError == nil {
 		killSaveRoutineChannel <- true
 		win.Close()
+
+		glib.IdleAdd(func() {
+			if !appConfig.ShowTrayIcon {
+				noNotesDialog := gtk.MessageDialogNew(win, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_NONE, "All notes have been deleted.\nDo you want to create a new note or close the application?")
+
+				const responseNewNote = 0
+				const responseCloseApplicaion = 1
+
+				noNotesDialog.AddButton("Create new note", responseNewNote)
+				noNotesDialog.AddButton("Close application", responseCloseApplicaion)
+
+				choice := noNotesDialog.Run()
+				noNotesDialog.Destroy()
+				if choice == responseNewNote {
+					//Gonna ignore this error for now, as it probably means the users tinkered with the files manually
+					amountOfNotes, _ := data.GetAmountOfNotes()
+					if amountOfNotes == 0 {
+						CreateNoteGUIWithDefaults()
+					}
+				} else {
+					gtk.MainQuit()
+					os.Exit(0)
+				}
+			}
+		})
 	} else {
 		message := fmt.Sprintf("Error deleting note '%s' (%s).", file, deleteError.Error())
 		dialog := gtk.MessageDialogNew(win, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, message)
