@@ -1,5 +1,7 @@
 # UwU Note
 
+[![Waffle.io - Columns and their card count](https://badge.waffle.io/UwUNote/uwunote.svg?columns=all)](https://waffle.io/UwUNote/uwunote)
+
 | linux | [![CircleCI - Linux](https://circleci.com/gh/UwUNote/uwunote/tree/master.svg?style=svg)](https://circleci.com/gh/UwUNote/uwunote/tree/master) |
 | - | - |
 | **darwin** | [![TravisCI - Mac OS](https://travis-ci.org/UwUNote/uwunote.svg?branch=master)](https://travis-ci.org/UwUNote/uwunote) |

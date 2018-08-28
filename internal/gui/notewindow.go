@@ -12,6 +12,7 @@ import (
 
 	"github.com/UwUNote/uwunote/internal/config"
 	"github.com/UwUNote/uwunote/internal/data"
+	"github.com/UwUNote/uwunote/internal/globconstants"
 	"github.com/UwUNote/uwunote/internal/util"
 )
 
@@ -34,7 +35,7 @@ func CreateWindowForNote(file string, x, y, width, height int) {
 	util.LogAndExitOnError(gtkError)
 
 	//setting the title in order to allow the user to distinguish the windows in his os gui or so
-	win.SetTitle("UwU Note - " + file)
+	win.SetTitle(globconstants.ApplicationName + " - " + file)
 
 	newButton, gtkError := gtk.ButtonNew()
 	util.LogAndExitOnError(gtkError)
@@ -50,7 +51,7 @@ func CreateWindowForNote(file string, x, y, width, height int) {
 	util.LogAndExitOnError(gtkError)
 
 	deleteButton.SetLabel("Delete")
-	deleteButton.Connect("clicked", func() { deleteNoteGUI(&appConfig, file, win, killSaveRoutineChannel) })
+	deleteButton.Connect("clicked", func() { deleteNoteGUI(appConfig, file, win, killSaveRoutineChannel) })
 	deleteButton.SetHExpand(false)
 	deleteButton.SetHAlign(gtk.ALIGN_END)
 
@@ -130,12 +131,12 @@ func CreateWindowForNote(file string, x, y, width, height int) {
 			if keyEvent.KeyVal() == gdk.KEY_s {
 				saveNoteGUI(win, file, buffer)
 			} else if keyEvent.KeyVal() == gdk.KEY_d {
-				deleteNoteGUI(&appConfig, file, win, killSaveRoutineChannel)
+				deleteNoteGUI(appConfig, file, win, killSaveRoutineChannel)
 			} else if keyEvent.KeyVal() == gdk.KEY_n {
 				currentX, currentY := win.GetPosition()
 				CreateNoteGUI(currentX+defaultXOffsetNewNote, currentY+defaultYOffsetNewNote, appConfig.DefaultNoteWidth, appConfig.DefaultNoteHeight, win)
 			} else if keyEvent.KeyVal() == gdk.KEY_o {
-				config.OpenAppConfig()
+				ShowSettingsDialog()
 			}
 		}
 	})

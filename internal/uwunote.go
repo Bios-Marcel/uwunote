@@ -44,7 +44,7 @@ func systemTrayRun() {
 				glib.IdleAdd(gui.CreateNoteGUIWithDefaults)
 
 			case <-settingsItem.ClickedCh:
-				config.OpenAppConfig()
+				glib.IdleAdd(gui.ShowSettingsDialog)
 
 			case <-quitItem.ClickedCh:
 				glib.IdleAdd(func() {
