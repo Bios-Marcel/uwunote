@@ -11,7 +11,6 @@ import (
 	"github.com/gotk3/gotk3/gtk"
 
 	"github.com/UwUNote/uwunote/internal/config"
-	"github.com/UwUNote/uwunote/internal/data"
 	"github.com/UwUNote/uwunote/internal/gui"
 	"github.com/UwUNote/uwunote/internal/util"
 )
@@ -21,7 +20,7 @@ func Start() {
 	config.CreateNeccessaryFiles()
 	util.LogAndExitOnError(config.LoadAppConfig())
 
-	os.MkdirAll(data.NotePath, os.ModePerm)
+	os.MkdirAll(config.GetAppConfig().NoteDirectory, os.ModePerm)
 
 	if config.GetAppConfig().ShowTrayIcon {
 		startWithTrayIcon()
@@ -73,7 +72,7 @@ func start() {
 
 //Creates a window for every note inside of the notePath
 func generateNoteWindows() {
-	files, err := ioutil.ReadDir(data.NotePath)
+	files, err := ioutil.ReadDir(config.GetAppConfig().NoteDirectory)
 
 	if err != nil {
 		log.Fatal("Error reading notes.")
@@ -96,7 +95,7 @@ func generateNoteWindows() {
 			fileName := fileInfo.Name()
 			configForWindow, exists := config.GetWindowDataForFile(fileName)
 
-			pathToNote := filepath.Join(data.NotePath, fileName)
+			pathToNote := filepath.Join(config.GetAppConfig().NoteDirectory, fileName)
 			if exists {
 				gui.CreateWindowForNote(pathToNote, configForWindow.X, configForWindow.Y, configForWindow.Width, configForWindow.Height)
 			} else {

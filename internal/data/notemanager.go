@@ -10,9 +10,6 @@ import (
 	"github.com/UwUNote/uwunote/internal/config"
 )
 
-//NotePath is the path at which notes are saved
-var NotePath = config.GetAppConfig().NoteDirectory
-
 //LoadNote loads the content of a note and returns an error on failure.
 func LoadNote(file string) ([]byte, error) {
 	return ioutil.ReadFile(file)
@@ -35,7 +32,7 @@ func DeleteNote(file string) error {
 //CreateNote generates a new notefile and returns an error on failure.
 func CreateNote() (*string, error) {
 	fileName := uuid.Must(uuid.NewV4())
-	newNotePath := NotePath + string(os.PathSeparator) + fileName.String()
+	newNotePath := config.GetAppConfig().NoteDirectory + string(os.PathSeparator) + fileName.String()
 	newFile, createError := os.Create(newNotePath)
 	if createError != nil {
 		return nil, createError
@@ -48,7 +45,7 @@ func CreateNote() (*string, error) {
 //GetAmountOfNotes returns the amount of existing notes or `0` and an error.
 //Only top level files are counted.
 func GetAmountOfNotes() (int, error) {
-	files, err := ioutil.ReadDir(NotePath)
+	files, err := ioutil.ReadDir(config.GetAppConfig().NoteDirectory)
 
 	if err != nil {
 		return 0, err
