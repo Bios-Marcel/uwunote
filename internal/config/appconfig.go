@@ -12,6 +12,7 @@ import (
 
 //AppConfig contains all possible configuration values
 type AppConfig struct {
+	DeleteNotesToTrashbin bool
 	AskBeforeNoteDeletion bool
 
 	AutoSaveAfterTyping      bool
@@ -37,6 +38,7 @@ var (
 //GetAppConfigDefaults returns all defaults for the application configuration
 func GetAppConfigDefaults() AppConfig {
 	return AppConfig{
+		DeleteNotesToTrashbin: true,
 		AskBeforeNoteDeletion: true,
 
 		AutoSaveAfterTyping:      true,

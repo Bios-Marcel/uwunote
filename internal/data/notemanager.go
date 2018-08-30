@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/Bios-Marcel/wastebasket"
 	uuid "github.com/satori/go.uuid"
 
 	"github.com/UwUNote/uwunote/internal/config"
@@ -24,6 +25,10 @@ func SaveNote(file string, textToSave []byte) error {
 
 //DeleteNote deletes a notes data
 func DeleteNote(file string) error {
+	if config.GetAppConfig().DeleteNotesToTrashbin {
+		return wastebasket.Trash(file)
+	}
+
 	return os.Remove(file)
 }
 

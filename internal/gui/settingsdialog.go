@@ -90,14 +90,27 @@ func ShowSettingsDialog() {
 	askBeforeNoteDeletionSwitch, _ := gtk.SwitchNew()
 
 	askBeforeNoteDeletionLabel.SetHAlign(gtk.ALIGN_START)
-	askBeforeNoteDeletionLabel.SetTooltipText("Shows a dialog before deleting a note, to make a sure you don't accidently delete a note.")
+	askBeforeNoteDeletionToolTip := "Shows a dialog before deleting a note, to make a sure you don't accidently delete a note."
+	askBeforeNoteDeletionLabel.SetTooltipText(askBeforeNoteDeletionToolTip)
+	askBeforeNoteDeletionSwitch.SetTooltipText(askBeforeNoteDeletionToolTip)
+
+	//DeleteNotesToTrashbin
+	deleteNotesToTrashbinLabel, _ := gtk.LabelNew("Use system trashbin")
+	deleteNotesToTrashbinSwitch, _ := gtk.SwitchNew()
+
+	deleteNotesToTrashbinLabel.SetHAlign(gtk.ALIGN_START)
+	deleteNotesToTrashbinToolTip := "Decides wether the systems trashbin will be used, this makes notes recoverable."
+	deleteNotesToTrashbinLabel.SetTooltipText(deleteNotesToTrashbinToolTip)
+	deleteNotesToTrashbinSwitch.SetTooltipText(deleteNotesToTrashbinToolTip)
 
 	//ShowTrayIcon
 	showTrayIconLabel, _ := gtk.LabelNew("Show tray icon")
 	showTrayIconSwitch, _ := gtk.SwitchNew()
 
 	showTrayIconLabel.SetHAlign(gtk.ALIGN_START)
-	showTrayIconLabel.SetTooltipText("Shows a tray icon in the systems tray area.")
+	showTrayIconToolTip := "Shows a tray icon in the systems tray area."
+	showTrayIconLabel.SetTooltipText(showTrayIconToolTip)
+	showTrayIconSwitch.SetTooltipText(showTrayIconToolTip)
 
 	//GeneralSettings Tab
 	generalSettingsTab, _ := gtk.GridNew()
@@ -106,7 +119,10 @@ func ShowSettingsDialog() {
 	generalSettingsTab.Add(askBeforeNoteDeletionLabel)
 	generalSettingsTab.AttachNextTo(askBeforeNoteDeletionSwitch, askBeforeNoteDeletionLabel, gtk.POS_RIGHT, 1, 1)
 
-	generalSettingsTab.AttachNextTo(noteDirectoryLabel, askBeforeNoteDeletionLabel, gtk.POS_BOTTOM, 1, 1)
+	generalSettingsTab.AttachNextTo(deleteNotesToTrashbinLabel, askBeforeNoteDeletionLabel, gtk.POS_BOTTOM, 1, 1)
+	generalSettingsTab.AttachNextTo(deleteNotesToTrashbinSwitch, deleteNotesToTrashbinLabel, gtk.POS_RIGHT, 1, 1)
+
+	generalSettingsTab.AttachNextTo(noteDirectoryLabel, deleteNotesToTrashbinLabel, gtk.POS_BOTTOM, 1, 1)
 	generalSettingsTab.AttachNextTo(noteDirectoryPicker, noteDirectoryLabel, gtk.POS_RIGHT, 1, 1)
 
 	//AutoSaveDelay
@@ -164,6 +180,7 @@ func ShowSettingsDialog() {
 	settingsTabContainer.AppendPage(appearanceSettingsTab, appearanceSettingsTabLabel)
 
 	initializeFunction := func(appConfigToUse *config.AppConfig) {
+		deleteNotesToTrashbinSwitch.SetActive(appConfigToUse.DeleteNotesToTrashbin)
 		askBeforeNoteDeletionSwitch.SetActive(appConfigToUse.AskBeforeNoteDeletion)
 		//TODO Replace SetCurrentFolder with SetFilename in case my pullrequest gets accepted.
 		noteDirectoryPicker.SetCurrentFolder(appConfigToUse.NoteDirectory)
@@ -207,6 +224,7 @@ func ShowSettingsDialog() {
 	//Save on close
 	settingsWindow.Connect("destroy", func() {
 		//GeneralSettings
+		appConfig.AskBeforeNoteDeletion = deleteNotesToTrashbinSwitch.GetActive()
 		appConfig.AskBeforeNoteDeletion = askBeforeNoteDeletionSwitch.GetActive()
 		appConfig.NoteDirectory = noteDirectoryPicker.GetFilename()
 		appConfig.ShowTrayIcon = showTrayIconSwitch.GetActive()
