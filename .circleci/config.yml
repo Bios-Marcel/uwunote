@@ -20,6 +20,6 @@ jobs:
       - run: go test -v ./...
       - run: go build
 
-    - store_artifacts:
-        path: /go/src/github.com/UwUNote/uwunote/uwunote
-        destination: uwunote
+      - store_artifacts:
+          path: /go/src/github.com/UwUNote/uwunote/uwunote
+          destination: uwunote
