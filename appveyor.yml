@@ -5,6 +5,10 @@ environment:
 
 stack: go 1.10
 
+artifacts:
+  - path: uwunote.exe
+    name: UwUNote
+
 install:
   - SET PATH=%PATH%;C:\msys64\mingw64\bin;C:\msys64\usr\bin
   - pacman --noconfirm --needed -Sy bash pacman pacman-mirrors msys2-runtime
