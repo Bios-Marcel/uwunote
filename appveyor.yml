@@ -6,8 +6,8 @@ environment:
 stack: go 1.10
 
 artifacts:
-  - path: uwunote.exe
-    name: UwUNote
+  - path: main.exe
+    name: UwUNote.exe
 
 install:
   - SET PATH=%PATH%;C:\msys64\mingw64\bin;C:\msys64\usr\bin
@@ -22,6 +22,7 @@ install:
 build_script:
   - go get -v ./...
   - go build -ldflags "-H windowsgui" main.go
+  - 
 
 test_script:
   - go vet ./...
