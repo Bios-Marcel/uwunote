@@ -21,7 +21,7 @@ install:
 
 build_script:
   - go get -v ./...
-  - go build -ldflags "-h windowsgui" main.go
+  - go build -ldflags "-H windowsgui" main.go
 
 test_script:
   - go vet ./...
