@@ -17,7 +17,7 @@ install:
   - pacman --noconfirm -S mingw-w64-x86_64-gcc
   - pacman --noconfirm -S mingw64/mingw-w64-x86_64-pkg-config
   - pacman --noconfirm -S mingw-w64-x86_64-gtk3
-  - bash -c "sed -i -e 's/-wl,-luuid/-luuid/g' C:\msys64\mingw64\lib\pkgconfig\gdk-3.0.pc"
+  - bash -c "sed -i -e 's/-Wl,-luuid/-luuid/g' C:/msys64/mingw64/lib/pkgconfig/gdk-3.0.pc"
 
 build_script:
   - go get -v ./...
