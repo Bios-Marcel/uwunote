@@ -8,10 +8,10 @@ stack: go 1.10
 install:
   - SET PATH=%PATH%;C:\msys64\mingw64\bin;C:\msys64\usr\bin
   - pacman --noconfirm --needed -Sy bash pacman pacman-mirrors msys2-runtime
-  - pacman -Su
-  - pacman -Su
-  - pacman -S mingw-w64-x86_64-gcc
-  - pacman -S mingw64/mingw-w64-x86_64-pkg-config
+  - pacman --noconfirm -Su
+  - pacman --noconfirm -Su
+  - pacman --noconfirm -S mingw-w64-x86_64-gcc
+  - pacman --noconfirm -S mingw64/mingw-w64-x86_64-pkg-config
   - pacman --noconfirm -S mingw-w64-x86_64-gtk3
   - bash -c "sed -i -e 's/-wl,-luuid/-luuid/g' C:\msys64\mingw64\lib\pkgconfig\gdk-3.0.pc"
 
