@@ -1,0 +1,20 @@
+image:
+  - MinGW, MSYS, Cygwin
+
+clone_folder: c:\gopath\src\github.com\Bios-Marcel\wastebasket
+
+environment:
+  GOPATH: c:\gopath
+
+stack: go 1.10
+
+install:
+  - SET PATH=%PATH%;C:\msys64\mingw64\bin;C:\msys64\usr\bin
+  - pacman --noconfirm -S mingw-w64-x86_64-gtk3
+
+build_script:
+  - go get -v ./...
+
+test_script:
+  - go vet ./...
+  - go test ./...
