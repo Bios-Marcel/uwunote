@@ -182,8 +182,7 @@ func ShowSettingsDialog() {
 	initializeFunction := func(appConfigToUse *config.AppConfig) {
 		deleteNotesToTrashbinSwitch.SetActive(appConfigToUse.DeleteNotesToTrashbin)
 		askBeforeNoteDeletionSwitch.SetActive(appConfigToUse.AskBeforeNoteDeletion)
-		//TODO Replace SetCurrentFolder with SetFilename in case my pullrequest gets accepted.
-		noteDirectoryPicker.SetCurrentFolder(appConfigToUse.NoteDirectory)
+		noteDirectoryPicker.SetFilename(appConfigToUse.NoteDirectory)
 		showTrayIconSwitch.SetActive(appConfigToUse.ShowTrayIcon)
 
 		autoIndentSwitch.SetActive(appConfigToUse.AutoIndent)
