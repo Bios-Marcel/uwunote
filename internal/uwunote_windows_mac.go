@@ -1,4 +1,4 @@
-// +build windows mac
+// +build windows darwin
 
 package internal
 
