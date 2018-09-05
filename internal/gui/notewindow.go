@@ -141,21 +141,7 @@ func CreateWindowForNote(file string, x, y, width, height int) {
 		}
 	})
 
-	//Rebuilding behaviour from TYPE_HINT_DESKTOP
-	win.SetSkipTaskbarHint(true)
-	win.SetSkipPagerHint(true)
-	win.SetKeepBelow(true)
-	win.Stick()
-
-	//HACK Making the window effectively unminimizable, but doesn't reliably work
-	win.Connect("window-state-event", func(window *gtk.Window, event *gdk.Event) {
-		windowEvent := gdk.EventWindowStateNewFromEvent(event)
-		newWindowState := windowEvent.NewWindowState()
-
-		if (newWindowState & gdk.WINDOW_STATE_ICONIFIED) == gdk.WINDOW_STATE_ICONIFIED {
-			glib.TimeoutAdd(125, window.Present)
-		}
-	})
+	makeWindowSturdy(win)
 
 	noteName := filepath.Base(file)
 	registerWindowStatePersister(noteName, win)
