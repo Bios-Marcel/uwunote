@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"time"
 
 	"github.com/gotk3/gotk3/gdk"
@@ -29,13 +30,8 @@ func CreateWindowForNote(file string, x, y, width, height int) {
 
 	appConfig := config.GetAppConfig()
 
-	// Create a new toplevel window and connect it to the
-	// "destroy" signal to exit the GTK main loop when it is destroyed.
 	win, gtkError := gtk.WindowNew(gtk.WINDOW_TOPLEVEL)
 	util.LogAndExitOnError(gtkError)
-
-	//setting the title in order to allow the user to distinguish the windows in his os gui or so
-	win.SetTitle(globconstants.ApplicationName + " - " + file)
 
 	newButton, gtkError := gtk.ButtonNew()
 	util.LogAndExitOnError(gtkError)
@@ -149,16 +145,24 @@ func CreateWindowForNote(file string, x, y, width, height int) {
 		}
 	})
 
-	makeWindowSturdy(win)
-
 	noteName := filepath.Base(file)
 	registerWindowStatePersister(noteName, win)
 
 	win.Move(x, y)
 	win.SetDefaultSize(width, height)
 
+	if runtime.GOOS != "windows" {
+		makeWindowSturdy(win)
+	}
+
 	// Recursively show all widgets contained in this window.
 	win.ShowAll()
+
+	if runtime.GOOS == "windows" {
+		win.SetTitle(globconstants.ApplicationName + " - " + file)
+		makeWindowSturdy(win)
+		win.SetTitle("")
+	}
 }
 
 func registerAutoIndentListener(buffer *gtk.TextBuffer) {
