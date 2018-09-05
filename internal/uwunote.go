@@ -32,7 +32,9 @@ func Start() {
 func systemTrayRun() {
 	systray.SetIcon(gui.AppIcon)
 	newNoteItem := systray.AddMenuItem("New note", "Creates a new note")
+	systray.AddSeparator()
 	settingsItem := systray.AddMenuItem("Settings", "Opens the settings")
+	shortcutsItem := systray.AddMenuItem("Shortcuts", "Opens the shortcuts dialog")
 	systray.AddSeparator()
 	quitItem := systray.AddMenuItem("Quit", "Closes the application")
 
@@ -44,6 +46,9 @@ func systemTrayRun() {
 
 			case <-settingsItem.ClickedCh:
 				glib.IdleAdd(gui.ShowSettingsDialog)
+
+			case <-shortcutsItem.ClickedCh:
+				glib.IdleAdd(gui.ShowShortcutsDialog)
 
 			case <-quitItem.ClickedCh:
 				glib.IdleAdd(func() {

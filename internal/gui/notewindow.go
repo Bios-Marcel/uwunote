@@ -127,16 +127,24 @@ func CreateWindowForNote(file string, x, y, width, height int) {
 
 	win.Connect("key_release_event", func(window *gtk.Window, event *gdk.Event) {
 		keyEvent := gdk.EventKeyNewFromEvent(event)
-		if (keyEvent.State() & gdk.GDK_CONTROL_MASK) == gdk.GDK_CONTROL_MASK {
-			if keyEvent.KeyVal() == gdk.KEY_s {
+		keyEventState := keyEvent.State()
+
+		if (keyEventState & gdk.GDK_CONTROL_MASK) == gdk.GDK_CONTROL_MASK {
+			keyVal := keyEvent.KeyVal()
+
+			if keyVal == gdk.KEY_s {
 				saveNoteGUI(win, file, buffer)
-			} else if keyEvent.KeyVal() == gdk.KEY_d {
+			} else if keyVal == gdk.KEY_d {
 				deleteNoteGUI(appConfig, file, win, killSaveRoutineChannel)
-			} else if keyEvent.KeyVal() == gdk.KEY_n {
+			} else if keyVal == gdk.KEY_n {
 				currentX, currentY := win.GetPosition()
 				CreateNoteGUI(currentX+defaultXOffsetNewNote, currentY+defaultYOffsetNewNote, appConfig.DefaultNoteWidth, appConfig.DefaultNoteHeight, win)
-			} else if keyEvent.KeyVal() == gdk.KEY_o {
+			} else if keyVal == gdk.KEY_o {
 				ShowSettingsDialog()
+			}
+		} else if (keyEventState & uint(gtk.AcceleratorGetDefaultModMask())) == 0 {
+			if keyEvent.KeyVal() == gdk.KEY_F1 {
+				ShowShortcutsDialog()
 			}
 		}
 	})
