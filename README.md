@@ -1,11 +1,10 @@
 # UwU Note
 
-[![Waffle.io - Columns and their card count](https://badge.waffle.io/UwUNote/uwunote.svg?columns=all)](https://waffle.io/UwUNote/uwunote)
-
+| OS | Build-Status |
+| - |:- |
 | linux | [![CircleCI - Linux](https://circleci.com/gh/UwUNote/uwunote/tree/master.svg?style=svg)](https://circleci.com/gh/UwUNote/uwunote/tree/master) |
-| - | - |
-| **darwin** | [![TravisCI - Mac OS](https://travis-ci.org/UwUNote/uwunote.svg?branch=master)](https://travis-ci.org/UwUNote/uwunote) |
-| **windows** | [![AppVeyor - Windows](https://ci.appveyor.com/api/projects/status/7e3yaftwricytyj5/branch/master?svg=true)](https://ci.appveyor.com/project/Bios-Marcel/uwunote/branch/master) |
+| darwin | [![TravisCI - Mac OS](https://travis-ci.org/UwUNote/uwunote.svg?branch=master)](https://travis-ci.org/UwUNote/uwunote) |
+| windows | [![AppVeyor - Windows](https://ci.appveyor.com/api/projects/status/7e3yaftwricytyj5/branch/master?svg=true)](https://ci.appveyor.com/project/Bios-Marcel/uwunote/branch/master) |
 
 First of all, I really hate making up names, so `UwU Note` is all you get.
 
