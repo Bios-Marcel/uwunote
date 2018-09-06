@@ -77,35 +77,34 @@ func start() {
 
 //Creates a window for every note inside of the notePath
 func generateNoteWindows() {
-	files, err := ioutil.ReadDir(config.GetAppConfig().NoteDirectory)
+	files, errorReadingNotes := ioutil.ReadDir(config.GetAppConfig().NoteDirectory)
 
-	if err != nil {
-		log.Fatal("Error reading notes.")
-		panic(err)
+	if errorReadingNotes != nil {
+		log.Fatalf("Error reading notes (%s).", errorReadingNotes.Error())
 	}
 
 	config.LoadWindowConfiguration()
 	appConfig := config.GetAppConfig()
 
 	if len(files) == 0 {
-		log.Println("Generating a initial note.")
+		//Creating a single note, as there are no existing notes yet.
 		gui.CreateNoteGUIWithDefaults()
-	} else {
-		log.Println("Creating windows for existing notes.")
-		for _, fileInfo := range files {
-			if fileInfo.IsDir() {
-				continue
-			}
+		return
+	}
 
-			fileName := fileInfo.Name()
-			configForWindow, exists := config.GetWindowDataForFile(fileName)
+	for _, fileInfo := range files {
+		if fileInfo.IsDir() {
+			continue
+		}
 
-			pathToNote := filepath.Join(config.GetAppConfig().NoteDirectory, fileName)
-			if exists {
-				gui.CreateWindowForNote(pathToNote, configForWindow.X, configForWindow.Y, configForWindow.Width, configForWindow.Height)
-			} else {
-				gui.CreateWindowForNote(pathToNote, appConfig.DefaultNoteX, appConfig.DefaultNoteY, appConfig.DefaultNoteWidth, appConfig.DefaultNoteHeight)
-			}
+		fileName := fileInfo.Name()
+		configForNoteWindow, noteWindowConfigExists := config.GetWindowDataForFile(fileName)
+
+		pathToNote := filepath.Join(config.GetAppConfig().NoteDirectory, fileName)
+		if noteWindowConfigExists {
+			gui.CreateWindowForNote(pathToNote, configForNoteWindow.X, configForNoteWindow.Y, configForNoteWindow.Width, configForNoteWindow.Height)
+		} else {
+			gui.CreateWindowForNote(pathToNote, appConfig.DefaultNoteX, appConfig.DefaultNoteY, appConfig.DefaultNoteWidth, appConfig.DefaultNoteHeight)
 		}
 	}
 }
