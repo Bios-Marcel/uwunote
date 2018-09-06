@@ -90,7 +90,7 @@ func ShowSettingsDialog() {
 	askBeforeNoteDeletionSwitch, _ := gtk.SwitchNew()
 
 	askBeforeNoteDeletionLabel.SetHAlign(gtk.ALIGN_START)
-	askBeforeNoteDeletionToolTip := "Shows a dialog before deleting a note, to make a sure you don't accidently delete a note."
+	askBeforeNoteDeletionToolTip := "Shows a dialog before deleting a note, to make a sure you don't accidentally delete a note."
 	askBeforeNoteDeletionLabel.SetTooltipText(askBeforeNoteDeletionToolTip)
 	askBeforeNoteDeletionSwitch.SetTooltipText(askBeforeNoteDeletionToolTip)
 
