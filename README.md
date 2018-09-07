@@ -23,26 +23,22 @@ For the future i have planned some stuff:
 * [An android app](https://github.com/UwUNote/uwunote-android)
 * Markdown support
 
-## Installation
+## Installation using pre-built binaries
 
-As this is a work in progress, there are currently no installation instructions, just build the project yourself instead.
-Theretically you should be able to build it on every platform supporting GTk3+.
+The Linux binaries can be found [here](https://circleci.com/gh/UwUNote/uwunote/). Just click the latest **green**(passing) build and download it under artifacts.
 
-Official binaries are gonna follow at some point, maybe even a snap or flatpak.
+The Windows binaries can be found [here](https://ci.appveyor.com/project/Bios-Marcel/uwunote/branch/master/artifacts). The Windows binaries can currently only be used if the dependencies are installed on your machine, if you want to install the dependencies, check [this tutorial](https://gianlucacosta.info/go-gui-apps-on-windows) out.
 
-As of now, you can do the followig:
+MacOS binaries are currently not available.
 
-```bash
-cd $GOPATH
-go get github.com/UwUNote/uwunote
-cd src/github.com/UwUNote/uwunote
-go get ./...
-go install
-```
+## Building manually
 
-which will put a ready to use binary called `uwunote` into `$GOPATH/bin`.
+You need the development packages of following libraries:
 
-## Building
+* GTK+3 (3.22 and later)
+* GDK 3
+* GLib 2
+* Cairo
 
 To build the app you simply run these commands:
 
@@ -54,12 +50,13 @@ go get ./...
 go build
 ```
 
-You need the development packages of following libraries:
+In case you want to put the binary into your go path, run
 
-* GTK+3 (3.12 and later)
-* GDK 3 (3.12 and later)
-* GLib 2 (2.36 and later)
-* Cairo (1.10 and later)
+```bash
+go install
+```
+
+as the last command instead, that will put a ready to use binary called `uwunote` into `$GOPATH/bin`.
 
 ### Linux
 
@@ -69,11 +66,9 @@ In addition to the default dependencies, linux needs additional dependencies:
 
 You can most likely install all dependencies via your systems packagemanager.
 
-### Mac OS
-
-TODO
-
 ### Windows
+
+Follow the tutorial mentioned in the comment and apply the fix manually.
 
 [https://github.com/UwUNote/uwunote/issues/1#issuecomment-414850043](https://github.com/UwUNote/uwunote/issues/1#issuecomment-414850043)
 
@@ -81,6 +76,8 @@ TODO
 
 Configuration is currently done by editing a JSON file, check the wiki for more information:
 [https://github.com/UwUNote/uwunote/wiki/Configuration](https://github.com/UwUNote/uwunote/wiki/Configuration)
+
+In case the documentation is outdated, you can always check the applications settings dialog. The settings dialog contains tooltips for every setting on each label.
 
 ## Contribute
 
