@@ -10,11 +10,10 @@ var (
 )
 
 func getHomeDir() string {
-	//TODO Consider a better solution
-
-	dir, err := homedir.Dir()
-	if err != nil {
-		return ""
+	//This is a severe error and therefore a panic is okay here!
+	dir, homeDirError := homedir.Dir()
+	if homeDirError != nil {
+		panic(homeDirError)
 	}
 
 	return dir
