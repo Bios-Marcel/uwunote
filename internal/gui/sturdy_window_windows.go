@@ -9,9 +9,6 @@ import (
 	"github.com/gotk3/gotk3/gtk"
 	uuid "github.com/satori/go.uuid"
 	"golang.org/x/sys/windows"
-
-
-	"github.com/UwUNote/uwunote/internal/globconstants"
 )
 
 var (
@@ -25,7 +22,7 @@ func ToBackground(gtkWindow *gtk.Window) error {
 	title, _ := gtkWindow.GetTitle()
 	titleAsByteArray := []byte(title)
 	hwnd, _, findError := findWindowFunction.Call(0, uintptr(unsafe.Pointer(&titleAsByteArray[0])))
-	if isWindowsError(findError)
+	if isWindowsError(findError) {
 		return findError
 	}
 
@@ -45,7 +42,7 @@ func isWindowsError(err error) bool {
 		return false
 	}
 
-	return err != "The operation completed successfully."
+	return err.Error() != "The operation completed successfully."
 }
 
 func makeWindowSturdy(window *gtk.Window) {
@@ -60,7 +57,7 @@ func showWindowSturdy(window *gtk.Window) {
 	window.ShowAll()
 
 	uniqueWindowTitle, _ := uuid.NewV4()
-	window.SetTitle(uniqueWindowTitle)
+	window.SetTitle(uniqueWindowTitle.String())
 	makeWindowSturdy(window)
 	window.SetTitle("")
 }
