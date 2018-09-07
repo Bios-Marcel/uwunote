@@ -15,5 +15,10 @@
         "color": "#c94cc2",
         "backgroundColor": "#55FFFF",
         "isWholeLine": false
-},
+    },
+    // Use gotype on the file currently being edited and report any semantic or syntactic errors found after configured delay.
+    "go.liveErrors": {
+        "enabled": true,
+        "delay": 1000
+    },
 }
