@@ -7,7 +7,11 @@ import (
 
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
+	uuid "github.com/satori/go.uuid"
 	"golang.org/x/sys/windows"
+
+
+	"github.com/UwUNote/uwunote/internal/globconstants"
 )
 
 var (
@@ -21,7 +25,7 @@ func ToBackground(gtkWindow *gtk.Window) error {
 	title, _ := gtkWindow.GetTitle()
 	titleAsByteArray := []byte(title)
 	hwnd, _, findError := findWindowFunction.Call(0, uintptr(unsafe.Pointer(&titleAsByteArray[0])))
-	if findError != nil && findError.Error() != "The operation completed successfully." {
+	if isWindowsError(findError)
 		return findError
 	}
 
@@ -29,11 +33,19 @@ func ToBackground(gtkWindow *gtk.Window) error {
 	width, height := gtkWindow.GetSize()
 	_, _, setPosError := setWindowPosFunction.Call(hwnd, uintptr(1), uintptr(x), uintptr(y), uintptr(width), uintptr(height), 0)
 
-	if setPosError != nil && setPosError.Error() != "The operation completed successfully." {
+	if isWindowsError(setPosError) {
 		return setPosError
 	}
 
 	return nil
+}
+
+func isWindowsError(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	return err != "The operation completed successfully."
 }
 
 func makeWindowSturdy(window *gtk.Window) {
@@ -42,4 +54,13 @@ func makeWindowSturdy(window *gtk.Window) {
 	window.SetTypeHint(gdk.WINDOW_TYPE_HINT_UTILITY)
 
 	ToBackground(window)
+}
+
+func showWindowSturdy(window *gtk.Window) {
+	window.ShowAll()
+
+	uniqueWindowTitle, _ := uuid.NewV4()
+	window.SetTitle(uniqueWindowTitle)
+	makeWindowSturdy(window)
+	window.SetTitle("")
 }

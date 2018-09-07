@@ -24,3 +24,8 @@ func makeWindowSturdy(window *gtk.Window) {
 		}
 	})
 }
+
+func showWindowSturdy(window *gtk.Window) {
+	makeWindowSturdy(window)
+	window.ShowAll()
+}

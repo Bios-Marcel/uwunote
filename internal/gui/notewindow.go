@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"runtime"
 	"time"
 
 	"github.com/gotk3/gotk3/gdk"
@@ -13,7 +12,6 @@ import (
 
 	"github.com/UwUNote/uwunote/internal/config"
 	"github.com/UwUNote/uwunote/internal/data"
-	"github.com/UwUNote/uwunote/internal/globconstants"
 	"github.com/UwUNote/uwunote/internal/util"
 )
 
@@ -151,18 +149,7 @@ func CreateWindowForNote(file string, x, y, width, height int) {
 	win.Move(x, y)
 	win.SetDefaultSize(width, height)
 
-	if runtime.GOOS != "windows" {
-		makeWindowSturdy(win)
-	}
-
-	// Recursively show all widgets contained in this window.
-	win.ShowAll()
-
-	if runtime.GOOS == "windows" {
-		win.SetTitle(globconstants.ApplicationName + " - " + file)
-		makeWindowSturdy(win)
-		win.SetTitle("")
-	}
+	showWindowSturdy(win)
 }
 
 func registerAutoIndentListener(buffer *gtk.TextBuffer) {
