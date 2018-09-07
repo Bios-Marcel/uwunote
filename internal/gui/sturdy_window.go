@@ -15,14 +15,17 @@ func makeWindowSturdy(window *gtk.Window) {
 	window.Stick()
 
 	//HACK Making the window effectively unminimizable, but doesn't reliably work
-	window.Connect("window-state-event", func(w *gtk.Window, event *gdk.Event) {
-		windowEvent := gdk.EventWindowStateNewFromEvent(event)
-		newWindowState := windowEvent.NewWindowState()
+	window.Connect("window-state-event", windowStateEventHandler)
+}
 
-		if (newWindowState & gdk.WINDOW_STATE_ICONIFIED) == gdk.WINDOW_STATE_ICONIFIED {
-			w.Present()
-		}
-	})
+func windowStateEventHandler(window *gtk.Window, event *gdk.Event) {
+	windowEvent := gdk.EventWindowStateNewFromEvent(event)
+	newWindowState := windowEvent.NewWindowState()
+
+	if (newWindowState&gdk.WINDOW_STATE_ICONIFIED) == gdk.WINDOW_STATE_ICONIFIED ||
+		(newWindowState&gdk.WINDOW_STATE_WITHDRAWN) == gdk.WINDOW_STATE_WITHDRAWN {
+		window.Present()
+	}
 }
 
 func showWindowSturdy(window *gtk.Window) {
