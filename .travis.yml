@@ -14,3 +14,4 @@ before_install:
   - sudo /opt/local/bin/port load dbus
   - sudo /opt/local/bin/port select --set python python27
   - sudo /opt/local/bin/port select --set python2 python27
+  - export PKG_CONFIG_PATH=/opt/local/lib/pkgconfig
