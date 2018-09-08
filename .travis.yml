@@ -11,7 +11,7 @@ before_install:
   - sudo /opt/local/bin/port -N install gtk3
   - sudo /opt/local/bin/port -N install glib2
   - sudo /opt/local/bin/port -N install pkgconfig
-  - sudo /opt/local/bin/port -N install xorg-xproto
+  - sudo /opt/local/bin/port -N install xorg-xorgproto
   - sudo /opt/local/bin/port load dbus
   - sudo /opt/local/bin/port select --set python python27
   - sudo /opt/local/bin/port select --set python2 python27
