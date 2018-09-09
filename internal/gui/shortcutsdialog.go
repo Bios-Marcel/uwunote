@@ -1,6 +1,10 @@
 package gui
 
-import "github.com/gotk3/gotk3/gtk"
+import (
+	"fmt"
+
+	"github.com/gotk3/gotk3/gtk"
+)
 
 var shortcutsDialogUIFile = `
 <?xml version="1.0" encoding="UTF-8"?>
@@ -70,13 +74,24 @@ func ShowShortcutsDialog() {
 	builder, _ := gtk.BuilderNew()
 	builder.AddFromString(shortcutsDialogUIFile)
 
-	window, _ := builder.GetObject("shortcuts-uwunote")
+	showErrorDialog := func(errorMessage string) {
+		message := fmt.Sprintf("Error showing shortcuts dialog (%s).", errorMessage)
+		dialog := gtk.MessageDialogNew(nil, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, message)
+		dialog.Run()
+		dialog.Destroy()
+	}
+
+	window, builderError := builder.GetObject("shortcuts-uwunote")
+	if builderError != nil {
+		showErrorDialog(builderError.Error())
+		return
+	}
+
 	windowCast, ok := window.(*gtk.ShortcutsWindow)
 	if ok {
 		windowCast.SetResizable(true)
 		windowCast.ShowAll()
 	} else {
-		//TODO Show error dialog instead.
-		panic("Invalid type")
+		showErrorDialog("Casting to ShortcutsWindow failed.")
 	}
 }
