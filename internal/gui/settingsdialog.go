@@ -267,6 +267,7 @@ func ShowSettingsDialog() {
 
 func setupTab(tab *gtk.Grid) {
 	tab.SetColumnSpacing(30)
+	tab.SetRowSpacing(5)
 
 	const margin = 10
 
