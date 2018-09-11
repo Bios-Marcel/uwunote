@@ -10,7 +10,7 @@ var shortcutsDialogUIFile = `
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <object class="GtkShortcutsWindow" id="shortcuts-uwunote">
-    <property name="modal">1</property>
+    <property name="modal">0</property>
     <child>
       <object class="GtkShortcutsSection">
         <property name="visible">1</property>

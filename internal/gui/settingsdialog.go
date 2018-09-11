@@ -216,7 +216,6 @@ func ShowSettingsDialog() {
 
 	settingsWindow.SetSkipTaskbarHint(true)
 	settingsWindow.SetSkipPagerHint(true)
-	settingsWindow.SetModal(true)
 
 	settingsWindow.SetPosition(gtk.WIN_POS_CENTER)
 
