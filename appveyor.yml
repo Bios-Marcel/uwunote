@@ -6,11 +6,14 @@ environment:
 stack: go 1.10
 
 artifacts:
-  - path: main.exe
+  - path: uwunote.exe
     name: UwUNote.exe
+  - path: uwunote-setup.exe
+    name: uwunote-setup.exe
 
 install:
-  - SET PATH=%PATH%;C:\msys64\mingw64\bin;C:\msys64\usr\bin
+  - SET PATH=%PATH%;C:\msys64\mingw64\bin;C:\msys64\usr\bin;C:\Program Files (x86)\Inno Setup 5
+  - SET MINGW_ROOT=C:\msys64\mingw64\
   - pacman --noconfirm --needed -Sy bash pacman pacman-mirrors
   - pacman --noconfirm -Su
   - pacman --noconfirm -Su
@@ -21,8 +24,8 @@ install:
 
 build_script:
   - go get -v ./...
-  - go build -ldflags "-H windowsgui" main.go
-  - 
+  - go build -o uwunote.exe -ldflags "-H windowsgui"
+  - ISCC .\windows-setup.iss
 
 test_script:
   - go vet ./...
