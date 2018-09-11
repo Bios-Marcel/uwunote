@@ -25,9 +25,10 @@ For the future i have planned some stuff:
 
 ## Installation using pre-built binaries
 
-The Linux binaries can be found [here](https://circleci.com/gh/UwUNote/uwunote/). Just click the latest **green**(passing) build and download it under artifacts.
+The Linux binary can be found [here](https://circleci.com/gh/UwUNote/uwunote/). Just click the latest **green**(passing) build and download it under artifacts.
 
-The Windows binaries can be found [here](https://ci.appveyor.com/project/Bios-Marcel/uwunote/branch/master/artifacts). The Windows binaries can currently only be used if the dependencies are installed on your machine, if you want to install the dependencies, check [this tutorial](https://gianlucacosta.info/go-gui-apps-on-windows) out.
+A Windows executable without dependencies and an installer with depdendencies can be found [here](https://ci.appveyor.com/project/Bios-Marcel/uwunote/branch/master/artifacts).
+If you want to manually install the dependencies, check [this tutorial](https://gianlucacosta.info/go-gui-apps-on-windows) out.
 
 MacOS binaries are currently not available.
 
