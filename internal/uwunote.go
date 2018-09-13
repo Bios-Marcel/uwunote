@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/UwUNote/uwunote/internal/updates"
+
 	"github.com/getlantern/systray"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
@@ -35,6 +37,7 @@ func systemTrayRun() {
 	systray.AddSeparator()
 	settingsItem := systray.AddMenuItem("Settings", "Opens the settings")
 	shortcutsItem := systray.AddMenuItem("Shortcuts", "Opens the shortcuts dialog")
+	checkForUpdatesItem := systray.AddMenuItem("Check for updates", "Checks for a newer version of this application")
 	systray.AddSeparator()
 	quitItem := systray.AddMenuItem("Quit", "Closes the application")
 
@@ -49,6 +52,13 @@ func systemTrayRun() {
 
 			case <-shortcutsItem.ClickedCh:
 				glib.IdleAdd(gui.ShowShortcutsDialog)
+
+			case <-checkForUpdatesItem.ClickedCh:
+				if updates.IsUpdateAvailable() {
+					glib.IdleAdd(updates.AskIfTheLatestReleaseShouldBeOpenedInBrowser)
+				} else {
+					glib.IdleAdd(updates.ShowUpToDateDialog)
+				}
 
 			case <-quitItem.ClickedCh:
 				glib.IdleAdd(func() {
