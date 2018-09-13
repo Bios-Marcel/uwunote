@@ -2,6 +2,7 @@ os: osx
 language: go
 go:
   - "1.10"
+gobuild_args: -ldflags "-X github.com/UwUNote/uwunote/internal/updates.AppVersion=$(git describe --tags --always --dirty)"
 
 before_install:
   - stty cols 80

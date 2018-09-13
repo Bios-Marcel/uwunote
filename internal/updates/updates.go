@@ -19,6 +19,12 @@ func IsUpdateAvailable() bool {
 		return false
 	}
 
+	curentVersion, parseError := semver.NewVersion(AppVersion)
+	if parseError != nil {
+		//Omitting check, since this seems to be a development build.
+		return false
+	}
+
 	client := github.NewClient(nil)
 	release, response, err := client.Repositories.GetLatestRelease(context.Background(), "UwUNote", "uwunote")
 	if response.StatusCode == 404 {
@@ -32,7 +38,6 @@ func IsUpdateAvailable() bool {
 	}
 
 	tagAsSemver := semver.MustParse(release.GetTagName())
-	curentVersion := semver.MustParse(AppVersion)
 
 	return tagAsSemver.GreaterThan(curentVersion)
 }
