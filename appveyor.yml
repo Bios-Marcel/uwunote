@@ -24,9 +24,9 @@ install:
 
 build_script:
   - go get ./...
-  - $env:UWU_VERSION=git describe --tags --always --dirty
-  - go build -o uwunote.exe -ldflags "-H windowsgui -X github.com\UwUNote\uwunote\internal\updates.AppVersion=$env:UWU_VERSION"
-  - ISCC .\windows-setup.iss
+  - ps: $env:UWU_VERSION=git describe --tags --always --dirty
+  - ps: go build -o uwunote.exe -ldflags "-H windowsgui -X github.com\UwUNote\uwunote\internal\updates.AppVersion=$env:UWU_VERSION"
+  - ps: ISCC .\windows-setup.iss
 
 test_script:
   - go vet ./...

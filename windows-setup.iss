@@ -1,8 +1,9 @@
 #define MINGW_ROOT GetEnv("MINGW_ROOT")
+#define UWU_VERSION GetEnv("UWU_VERSION")
 
 [Setup]
 AppName=UwU Note
-AppVersion=1.0
+AppVersion={#UWU_VERSION}
 DefaultDirName={userappdata}\uwunote
 
 OutputBaseFilename=uwunote-setup
