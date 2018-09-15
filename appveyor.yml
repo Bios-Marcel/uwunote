@@ -23,10 +23,11 @@ install:
   - bash -c "sed -i -e 's/-Wl,-luuid/-luuid/g' C:/msys64/mingw64/lib/pkgconfig/gdk-3.0.pc"
 
 build_script:
-  - go get ./...
-  - ps: $env:UWU_VERSION=git describe --tags --always --dirty
-  - ps: 'go build -o uwunote.exe -ldflags "-H windowsgui -X github.com/UwUNote/uwunote/internal/updates.AppVersion=$env:UWU_VERSION"'
-  - ps: ISCC .\windows-setup.iss
+  - go get -v ./...
+  - set UWU_VERSION_CMD="git describe --tags --always --dirty"
+  - FOR /F "tokens=*" %i IN (' %UWU_VERSION_CMD% ') DO SET UWU_VERSION=%i
+  - go build -o uwunote.exe -ldflags "-H windowsgui -X github.com/UwUNote/uwunote/internal/updates.AppVersion=%UWU_VERSION%"
+  - ISCC .\windows-setup.iss
 
 test_script:
   - go vet ./...
