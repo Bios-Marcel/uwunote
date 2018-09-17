@@ -98,5 +98,5 @@ func GetAppConfig() *AppConfig {
 //PersistAppConfig writes the given AppConfig as JSON to the filesystem.
 func PersistAppConfig(config *AppConfig) error {
 	appConfigurationJSON, _ := json.MarshalIndent(&config, "", "\t")
-	return ioutil.WriteFile(getAppConfigPath(), appConfigurationJSON, os.ModePerm)
+	return ioutil.WriteFile(getAppConfigPath(), appConfigurationJSON, 0666)
 }

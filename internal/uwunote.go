@@ -28,7 +28,7 @@ func Start() {
 	config.CreateNeccessaryFiles()
 	util.LogAndExitOnError(config.LoadAppConfig())
 
-	os.MkdirAll(config.GetAppConfig().NoteDirectory, os.ModePerm)
+	os.MkdirAll(config.GetAppConfig().NoteDirectory, 0666)
 
 	if config.GetAppConfig().ShowTrayIcon {
 		startWithTrayIcon()

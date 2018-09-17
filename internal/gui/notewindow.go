@@ -194,7 +194,6 @@ func registerWindowStatePersister(identifier string, window *gtk.Window) {
 		windowWidth, windowHeight := window.GetSize()
 
 		config.SetWindowDataForFile(identifier, windowX, windowY, windowWidth, windowHeight)
-
 		config.PersistWindowConfiguration()
 	})
 }
@@ -231,9 +230,12 @@ func deleteNoteGUI(appConfig *config.AppConfig, file string, win *gtk.Window, ki
 	}
 
 	deleteError := data.DeleteNote(file)
+
 	if deleteError == nil {
 		killSaveRoutineChannel <- true
 		win.Close()
+		config.DeleteWindowDataForFile(filepath.Base(file))
+		config.PersistWindowConfiguration()
 
 		glib.IdleAdd(func() {
 			if !appConfig.ShowTrayIcon {

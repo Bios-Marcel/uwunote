@@ -57,7 +57,7 @@ func LoadWindowConfiguration() {
 //PersistWindowConfiguration saves the current window configuration to its iven path
 func PersistWindowConfiguration() {
 	windowConfigurationJSON, _ := json.Marshal(&windowConfiguration)
-	writeError := ioutil.WriteFile(getWindowConfigPath(), windowConfigurationJSON, os.ModePerm)
+	writeError := ioutil.WriteFile(getWindowConfigPath(), windowConfigurationJSON, 0666)
 	util.LogAndExitOnError(writeError)
 }
 
@@ -65,6 +65,11 @@ func PersistWindowConfiguration() {
 func GetWindowDataForFile(file string) (WindowData, bool) {
 	data, exists := windowConfiguration.Data[file]
 	return data, exists
+}
+
+//DeleteWindowDataForFile removes an entry from the window data map.
+func DeleteWindowDataForFile(file string) {
+	delete(windowConfiguration.Data, file)
 }
 
 //SetWindowDataForFile sets coordinates and size in the window-config for the given file
