@@ -1,4 +1,4 @@
-package gui
+package error
 
 import (
 	"fmt"
