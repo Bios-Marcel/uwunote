@@ -31,9 +31,12 @@ type AppConfig struct {
 }
 
 var (
-	appConfigPath    = filepath.Join(configPath, "app.json")
 	appConfiguration = GetAppConfigDefaults()
 )
+
+func getAppConfigPath() string {
+	return filepath.Join(ConfigPath, "app.json")
+}
 
 //GetAppConfigDefaults returns all defaults for the application configuration
 func GetAppConfigDefaults() AppConfig {
@@ -59,7 +62,7 @@ func GetAppConfigDefaults() AppConfig {
 
 //LoadAppConfig loads the configuration or creates a default one if none is present
 func LoadAppConfig() error {
-	file, openError := os.Open(appConfigPath)
+	file, openError := os.Open(getAppConfigPath())
 	if openError != nil && os.IsNotExist(openError) {
 		writeError := PersistAppConfig(&appConfiguration)
 
@@ -92,5 +95,5 @@ func GetAppConfig() *AppConfig {
 //PersistAppConfig writes the given AppConfig as JSON to the filesystem.
 func PersistAppConfig(config *AppConfig) error {
 	appConfigurationJSON, _ := json.MarshalIndent(&config, "", "\t")
-	return ioutil.WriteFile(appConfigPath, appConfigurationJSON, os.ModePerm)
+	return ioutil.WriteFile(getAppConfigPath(), appConfigurationJSON, os.ModePerm)
 }

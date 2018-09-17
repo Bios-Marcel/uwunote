@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"flag"
 	"io/ioutil"
 	"log"
 	"os"
@@ -19,6 +20,11 @@ import (
 
 //Start initializes gtk and creates a window for every note.
 func Start() {
+	configpathPointer := flag.String("configdir", filepath.Join(util.HomeDir, ".uwunote"), "configdir <path to folder>")
+	flag.Parse()
+
+	config.ConfigPath = *configpathPointer
+
 	config.CreateNeccessaryFiles()
 	util.LogAndExitOnError(config.LoadAppConfig())
 

@@ -6,15 +6,19 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/UwUNote/uwunote/internal/util"
 )
 
 var (
-	windowConfigPath = configPath + string(os.PathSeparator) + "windows.json"
 	//Configuration contains the positions and sizes for all notes
 	windowConfiguration = WindowConfig{}
 )
+
+func getWindowConfigPath() string {
+	return filepath.Join(ConfigPath, "windows.json")
+}
 
 //WindowConfig contains a map of WindowData entries in a map
 type WindowConfig struct {
@@ -33,7 +37,7 @@ type WindowData struct {
 //LoadWindowConfiguration loads the window configuration from its path.
 func LoadWindowConfiguration() {
 	log.Println("Loading window configuration")
-	file, openError := os.Open(windowConfigPath)
+	file, openError := os.Open(getWindowConfigPath())
 	if openError == nil || os.IsExist(openError) {
 		defer file.Close()
 		decoder := json.NewDecoder(file)
@@ -53,8 +57,7 @@ func LoadWindowConfiguration() {
 //PersistWindowConfiguration saves the current window configuration to its iven path
 func PersistWindowConfiguration() {
 	windowConfigurationJSON, _ := json.Marshal(&windowConfiguration)
-	writeError := ioutil.WriteFile(windowConfigPath, windowConfigurationJSON, os.ModePerm)
-	//TODO Better way?
+	writeError := ioutil.WriteFile(getWindowConfigPath(), windowConfigurationJSON, os.ModePerm)
 	util.LogAndExitOnError(writeError)
 }
 
