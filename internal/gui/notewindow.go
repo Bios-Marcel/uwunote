@@ -64,6 +64,7 @@ func CreateWindowForNote(file string, x, y, width, height int) {
 
 	textView.SetVExpand(true)
 	textView.SetHExpand(true)
+	textView.SetWrapMode(appConfig.WrapMode)
 
 	//Wrapping the textView in a scrollpane, otherwise the window will expand instead
 	textViewScrollPane.Add(textView)

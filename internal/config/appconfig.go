@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/UwUNote/uwunote/internal/util"
+	"github.com/gotk3/gotk3/gtk"
 )
 
 //AppConfig contains all possible configuration values
@@ -18,6 +19,7 @@ type AppConfig struct {
 	AutoSaveAfterTyping      bool
 	AutoSaveAfterTypingDelay int
 
+	WrapMode   gtk.WrapMode
 	AutoIndent bool
 
 	NoteDirectory string
@@ -47,6 +49,7 @@ func GetAppConfigDefaults() AppConfig {
 		AutoSaveAfterTyping:      true,
 		AutoSaveAfterTypingDelay: 3000,
 
+		WrapMode:   gtk.WRAP_NONE,
 		AutoIndent: true,
 
 		NoteDirectory: filepath.Join(util.HomeDir, "notes"),

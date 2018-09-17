@@ -3,6 +3,8 @@ package gui
 import (
 	"math"
 
+	"github.com/gotk3/gotk3/glib"
+
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
 
@@ -153,6 +155,37 @@ func ShowSettingsDialog() {
 	autoIndentLabel.SetTooltipText(autoIndentToolTip)
 	autoIndentSwitch.SetTooltipText(autoIndentToolTip)
 
+	//WrapMode
+	wrapModeLabel, _ := gtk.LabelNew("Textwrapping")
+
+	const (
+		columnID = iota
+		columnText
+	)
+	wrapModeItems, _ := gtk.ListStoreNew(glib.TYPE_INT, glib.TYPE_STRING)
+	addItem := func(wrapMode gtk.WrapMode, text string) {
+
+		appendIter := wrapModeItems.Append()
+		wrapModeItems.SetValue(appendIter, columnID, wrapMode)
+		wrapModeItems.SetValue(appendIter, columnText, text)
+	}
+
+	addItem(gtk.WRAP_NONE, "None")
+	addItem(gtk.WRAP_CHAR, "Character")
+	addItem(gtk.WRAP_WORD, "Word")
+	addItem(gtk.WRAP_WORD_CHAR, "Wordcharacters")
+
+	wrapModeComboBox, _ := gtk.ComboBoxNewWithModel(wrapModeItems)
+
+	wrapModeRenderer, _ := gtk.CellRendererTextNew()
+	wrapModeComboBox.PackStart(wrapModeRenderer, true)
+	wrapModeComboBox.AddAttribute(wrapModeRenderer, "text", 1)
+
+	wrapModeLabel.SetHAlign(gtk.ALIGN_START)
+	const wrapModeToolTipText = "Determines wether the editor breaks the text if it out of bounds and how the text will be broken."
+	wrapModeLabel.SetTooltipText(wrapModeToolTipText)
+	wrapModeComboBox.SetTooltipText(wrapModeToolTipText)
+
 	//EditorSettings Tab
 	editorSettingsTab, _ := gtk.GridNew()
 	setupTab(editorSettingsTab)
@@ -165,6 +198,9 @@ func ShowSettingsDialog() {
 
 	editorSettingsTab.AttachNextTo(autoIndentLabel, autoSaveDelayLabel, gtk.POS_BOTTOM, 1, 1)
 	editorSettingsTab.AttachNextTo(autoIndentSwitch, autoIndentLabel, gtk.POS_RIGHT, 1, 1)
+
+	editorSettingsTab.AttachNextTo(wrapModeLabel, autoIndentLabel, gtk.POS_BOTTOM, 1, 1)
+	editorSettingsTab.AttachNextTo(wrapModeComboBox, wrapModeLabel, gtk.POS_RIGHT, 1, 1)
 
 	//TabContainer
 	settingsTabContainer, _ := gtk.NotebookNew()
@@ -189,6 +225,7 @@ func ShowSettingsDialog() {
 		autoSaveSwitch.SetActive(appConfigToUse.AutoSaveAfterTyping)
 		autoSaveDelaySpinner.SetValue(float64(appConfigToUse.AutoSaveAfterTypingDelay))
 		autoSaveDelaySpinner.SetSensitive(appConfigToUse.AutoSaveAfterTyping)
+		wrapModeComboBox.SetActive(int(appConfigToUse.WrapMode))
 
 		defaultNoteXSpinner.SetValue(float64(appConfigToUse.DefaultNoteX))
 		defaultNoteYSpinner.SetValue(float64(appConfigToUse.DefaultNoteY))
@@ -240,6 +277,7 @@ func ShowSettingsDialog() {
 		}
 
 		appConfig.AutoIndent = autoIndentSwitch.GetActive()
+		appConfig.WrapMode = gtk.WrapMode(wrapModeComboBox.GetActive())
 
 		//AppearanceSettings
 		appConfig.DefaultNoteX = defaultNoteXSpinner.GetValueAsInt()
