@@ -1,6 +1,7 @@
 package util
 
 import (
+	"github.com/UwUNote/uwunote/internal/errors"
 	"github.com/mitchellh/go-homedir"
 )
 
@@ -13,7 +14,7 @@ func getHomeDir() string {
 	//This is a severe error and therefore a panic is okay here!
 	dir, homeDirError := homedir.Dir()
 	if homeDirError != nil {
-		panic(homeDirError)
+		errors.ShowErrorDialogOnError(homeDirError)
 	}
 
 	return dir

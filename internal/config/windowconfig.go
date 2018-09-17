@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/UwUNote/uwunote/internal/util"
+	"github.com/UwUNote/uwunote/internal/errors"
 )
 
 var (
@@ -43,8 +43,8 @@ func LoadWindowConfiguration() {
 		decoder := json.NewDecoder(file)
 		windowConfigLoadError := decoder.Decode(&windowConfiguration)
 
-		if windowConfigLoadError != io.EOF {
-			util.LogAndExitOnError(windowConfigLoadError)
+		if windowConfigLoadError != nil && windowConfigLoadError != io.EOF {
+			errors.ShowErrorDialog(windowConfigLoadError)
 		}
 	}
 
@@ -58,7 +58,8 @@ func LoadWindowConfiguration() {
 func PersistWindowConfiguration() {
 	windowConfigurationJSON, _ := json.Marshal(&windowConfiguration)
 	writeError := ioutil.WriteFile(getWindowConfigPath(), windowConfigurationJSON, 0666)
-	util.LogAndExitOnError(writeError)
+
+	errors.ShowErrorDialogOnError(writeError)
 }
 
 //GetWindowDataForFile retrieves the window-config entry for the given file

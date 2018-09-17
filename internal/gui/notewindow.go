@@ -12,7 +12,7 @@ import (
 
 	"github.com/UwUNote/uwunote/internal/config"
 	"github.com/UwUNote/uwunote/internal/data"
-	"github.com/UwUNote/uwunote/internal/util"
+	"github.com/UwUNote/uwunote/internal/errors"
 )
 
 //CreateWindowForNote creates a window at the given position and with the
@@ -29,10 +29,10 @@ func CreateWindowForNote(file string, x, y, width, height int) {
 	appConfig := config.GetAppConfig()
 
 	win, gtkError := gtk.WindowNew(gtk.WINDOW_TOPLEVEL)
-	util.LogAndExitOnError(gtkError)
+	errors.ShowErrorDialogOnError(gtkError)
 
 	newButton, gtkError := gtk.ButtonNew()
-	util.LogAndExitOnError(gtkError)
+	errors.ShowErrorDialogOnError(gtkError)
 
 	newButton.SetLabel("New")
 	newButton.Connect("clicked", func() {
@@ -42,7 +42,7 @@ func CreateWindowForNote(file string, x, y, width, height int) {
 	newButton.SetHExpand(false)
 
 	deleteButton, gtkError := gtk.ButtonNew()
-	util.LogAndExitOnError(gtkError)
+	errors.ShowErrorDialogOnError(gtkError)
 
 	deleteButton.SetLabel("Delete")
 	deleteButton.Connect("clicked", func() { deleteNoteGUI(appConfig, file, win, killSaveRoutineChannel) })
@@ -50,17 +50,17 @@ func CreateWindowForNote(file string, x, y, width, height int) {
 	deleteButton.SetHAlign(gtk.ALIGN_END)
 
 	titleBar, gtkError := gtk.HeaderBarNew()
-	util.LogAndExitOnError(gtkError)
+	errors.ShowErrorDialogOnError(gtkError)
 
 	titleBar.PackStart(newButton)
 	titleBar.PackEnd(deleteButton)
 
 	var hAdjustment, vAdjustment *gtk.Adjustment
 	textViewScrollPane, gtkError := gtk.ScrolledWindowNew(hAdjustment, vAdjustment)
-	util.LogAndExitOnError(gtkError)
+	errors.ShowErrorDialogOnError(gtkError)
 
 	textView, gtkError := gtk.TextViewNew()
-	util.LogAndExitOnError(gtkError)
+	errors.ShowErrorDialogOnError(gtkError)
 
 	textView.SetVExpand(true)
 	textView.SetHExpand(true)
@@ -70,10 +70,10 @@ func CreateWindowForNote(file string, x, y, width, height int) {
 	textViewScrollPane.Add(textView)
 
 	buffer, gtkError := textView.GetBuffer()
-	util.LogAndExitOnError(gtkError)
+	errors.ShowErrorDialogOnError(gtkError)
 
 	fileContent, loadError := data.LoadNote(file)
-	util.LogAndExitOnError(loadError)
+	errors.ShowErrorDialogOnError(loadError)
 	buffer.SetText(string(fileContent))
 
 	if appConfig.AutoIndent {
@@ -112,7 +112,7 @@ func CreateWindowForNote(file string, x, y, width, height int) {
 	}
 
 	nodeLayout, gtkError := gtk.BoxNew(gtk.ORIENTATION_VERTICAL, 0)
-	util.LogAndExitOnError(gtkError)
+	errors.ShowErrorDialogOnError(gtkError)
 
 	nodeLayout.Add(textViewScrollPane)
 	nodeLayout.SetVExpand(true)

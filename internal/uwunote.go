@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/UwUNote/uwunote/internal/errors"
 	"github.com/UwUNote/uwunote/internal/updates"
 
 	"github.com/getlantern/systray"
@@ -26,7 +27,7 @@ func Start() {
 	config.ConfigPath = *configpathPointer
 
 	config.CreateNeccessaryFiles()
-	util.LogAndExitOnError(config.LoadAppConfig())
+	errors.ShowErrorDialogOnError(config.LoadAppConfig())
 
 	os.MkdirAll(config.GetAppConfig().NoteDirectory, 0666)
 

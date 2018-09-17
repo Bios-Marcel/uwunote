@@ -64,3 +64,9 @@ func ShowErrorDialog(err error) {
 
 	errorDialog.ShowAll()
 }
+
+func ShowErrorDialogOnError(err error) {
+	if err != nil {
+		ShowErrorDialog(err)
+	}
+}
