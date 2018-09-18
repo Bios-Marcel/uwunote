@@ -3,6 +3,9 @@ clone_folder: c:\gopath\src\github.com\UwUNote\uwunote
 environment:
   GOPATH: c:\gopath
 
+cache:
+  - c:\gopath\pkg
+
 stack: go 1.10
 
 artifacts:
