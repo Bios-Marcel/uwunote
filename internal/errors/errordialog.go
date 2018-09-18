@@ -65,6 +65,7 @@ func ShowErrorDialog(err error) {
 	errorDialog.ShowAll()
 }
 
+//ShowErrorDialogOnError only shows an error dialog if the passed error is not equal to nil
 func ShowErrorDialogOnError(err error) {
 	if err != nil {
 		ShowErrorDialog(err)
