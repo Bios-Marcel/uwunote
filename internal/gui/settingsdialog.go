@@ -37,6 +37,7 @@ func ShowSettingsDialog() {
 	defaultNoteXLabel.SetTooltipText("Default horizontal position for non relative positioned note windows.")
 
 	defaultNoteXSpinner, _ := gtk.SpinButtonNewWithRange(math.MinInt32, math.MaxInt32, 5)
+	expandAndAlignRight(&defaultNoteXSpinner.Widget)
 
 	//DefaultNoteY
 	defaultNoteYLabel, _ := gtk.LabelNew("Default vertical note position")
@@ -45,6 +46,7 @@ func ShowSettingsDialog() {
 	defaultNoteYLabel.SetTooltipText("Default vertical position for non relative positioned note windows.")
 
 	defaultNoteYSpinner, _ := gtk.SpinButtonNewWithRange(math.MinInt32, math.MaxInt32, 5)
+	expandAndAlignRight(&defaultNoteYSpinner.Widget)
 
 	//DefaultNoteWidth
 	defaultNoteWidthLabel, _ := gtk.LabelNew("Default note width")
@@ -53,6 +55,7 @@ func ShowSettingsDialog() {
 	defaultNoteWidthLabel.SetTooltipText("Default width for note windows.")
 
 	defaultNoteWidthSpinner, _ := gtk.SpinButtonNewWithRange(math.MinInt32, math.MaxInt32, 5)
+	expandAndAlignRight(&defaultNoteWidthSpinner.Widget)
 
 	//DefaultNoteHeight
 	defaultNoteHeightLabel, _ := gtk.LabelNew("Default note height")
@@ -61,6 +64,7 @@ func ShowSettingsDialog() {
 	defaultNoteHeightLabel.SetTooltipText("Default height for note windows.")
 
 	defaultNoteHeightSpinner, _ := gtk.SpinButtonNewWithRange(math.MinInt32, math.MaxInt32, 5)
+	expandAndAlignRight(&defaultNoteHeightSpinner.Widget)
 
 	//appearanceSettings Tab
 	appearanceSettingsTab, _ := gtk.GridNew()
@@ -86,6 +90,7 @@ func ShowSettingsDialog() {
 	noteDirectoryToolTip := "Determines the folder in which all notes will be saved."
 	noteDirectoryLabel.SetTooltipText(noteDirectoryToolTip)
 	noteDirectoryPicker.SetTooltipText(noteDirectoryToolTip)
+	expandAndAlignRight(&noteDirectoryPicker.Widget)
 
 	//AskBeforeNoteDeletion
 	askBeforeNoteDeletionLabel, _ := gtk.LabelNew("Confirm note deletion")
@@ -95,6 +100,7 @@ func ShowSettingsDialog() {
 	askBeforeNoteDeletionToolTip := "Shows a dialog before deleting a note, to make a sure you don't accidentally delete a note."
 	askBeforeNoteDeletionLabel.SetTooltipText(askBeforeNoteDeletionToolTip)
 	askBeforeNoteDeletionSwitch.SetTooltipText(askBeforeNoteDeletionToolTip)
+	expandAndAlignRight(&askBeforeNoteDeletionSwitch.Widget)
 
 	//DeleteNotesToTrashbin
 	deleteNotesToTrashbinLabel, _ := gtk.LabelNew("Use system trashbin")
@@ -104,6 +110,7 @@ func ShowSettingsDialog() {
 	deleteNotesToTrashbinToolTip := "Decides wether the systems trashbin will be used, this makes notes recoverable."
 	deleteNotesToTrashbinLabel.SetTooltipText(deleteNotesToTrashbinToolTip)
 	deleteNotesToTrashbinSwitch.SetTooltipText(deleteNotesToTrashbinToolTip)
+	expandAndAlignRight(&deleteNotesToTrashbinSwitch.Widget)
 
 	//ShowTrayIcon
 	showTrayIconLabel, _ := gtk.LabelNew("Show tray icon")
@@ -113,6 +120,7 @@ func ShowSettingsDialog() {
 	showTrayIconToolTip := "Shows a tray icon in the systems tray area."
 	showTrayIconLabel.SetTooltipText(showTrayIconToolTip)
 	showTrayIconSwitch.SetTooltipText(showTrayIconToolTip)
+	expandAndAlignRight(&showTrayIconSwitch.Widget)
 
 	//GeneralSettings Tab
 	generalSettingsTab, _ := gtk.GridNew()
@@ -134,6 +142,7 @@ func ShowSettingsDialog() {
 	autoSaveDelayLabel.SetTooltipText("Time to wait before automatically saving the edited note after typing.")
 
 	autoSaveDelaySpinner, _ := gtk.SpinButtonNewWithRange(0, math.MaxFloat64, 50)
+	expandAndAlignRight(&autoSaveDelaySpinner.Widget)
 
 	//AutoSave
 	autoSaveLabel, _ := gtk.LabelNew("Autosave")
@@ -145,6 +154,7 @@ func ShowSettingsDialog() {
 	autoSaveSwitch.ConnectAfter("notify::active", func(button *gtk.Switch) {
 		autoSaveDelaySpinner.SetSensitive(button.GetActive())
 	})
+	expandAndAlignRight(&autoSaveSwitch.Widget)
 
 	//AutoIndent
 	autoIndentLabel, _ := gtk.LabelNew("Autoindent")
@@ -154,6 +164,7 @@ func ShowSettingsDialog() {
 	autoIndentToolTip := "Automatically indents a new line by the same amount of tabs, that the previous line was indented with."
 	autoIndentLabel.SetTooltipText(autoIndentToolTip)
 	autoIndentSwitch.SetTooltipText(autoIndentToolTip)
+	expandAndAlignRight(&autoIndentSwitch.Widget)
 
 	//WrapMode
 	wrapModeLabel, _ := gtk.LabelNew("Textwrapping")
@@ -180,6 +191,7 @@ func ShowSettingsDialog() {
 	wrapModeRenderer, _ := gtk.CellRendererTextNew()
 	wrapModeComboBox.PackStart(wrapModeRenderer, true)
 	wrapModeComboBox.AddAttribute(wrapModeRenderer, "text", 1)
+	expandAndAlignRight(&wrapModeComboBox.Widget)
 
 	wrapModeLabel.SetHAlign(gtk.ALIGN_START)
 	const wrapModeToolTipText = "Determines wether the editor breaks the text if it out of bounds and how the text will be broken."
@@ -205,6 +217,7 @@ func ShowSettingsDialog() {
 	//TabContainer
 	settingsTabContainer, _ := gtk.NotebookNew()
 	settingsTabContainer.SetVExpand(true)
+	settingsTabContainer.SetHExpand(true)
 
 	generalSettingsTabLabel, _ := gtk.LabelNew("General")
 	settingsTabContainer.AppendPage(generalSettingsTab, generalSettingsTabLabel)
@@ -231,7 +244,6 @@ func ShowSettingsDialog() {
 		defaultNoteYSpinner.SetValue(float64(appConfigToUse.DefaultNoteY))
 		defaultNoteWidthSpinner.SetValue(float64(appConfigToUse.DefaultNoteWidth))
 		defaultNoteHeightSpinner.SetValue(float64(appConfigToUse.DefaultNoteHeight))
-
 	}
 
 	initializeFunction(&appConfig)
@@ -300,6 +312,11 @@ func ShowSettingsDialog() {
 		window:             settingsWindow,
 		initializeFunction: initializeFunction,
 	}
+}
+
+func expandAndAlignRight(widget *gtk.Widget) {
+	widget.SetHAlign(gtk.ALIGN_END)
+	widget.SetHExpand(true)
 }
 
 func setupTab(tab *gtk.Grid) {
