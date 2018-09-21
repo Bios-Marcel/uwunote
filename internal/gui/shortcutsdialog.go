@@ -3,6 +3,7 @@ package gui
 import (
 	"fmt"
 
+	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
 )
 
@@ -89,7 +90,14 @@ func ShowShortcutsDialog() {
 
 	windowCast, ok := window.(*gtk.ShortcutsWindow)
 	if ok {
+		pixbufLoader, _ := gdk.PixbufLoaderNew()
+		iconAsPixbuf, _ := pixbufLoader.WriteAndReturnPixbuf(AppIcon)
+		windowCast.SetIcon(iconAsPixbuf)
+
+		windowCast.SetSkipTaskbarHint(true)
+		windowCast.SetSkipPagerHint(true)
 		windowCast.SetResizable(true)
+
 		windowCast.ShowAll()
 	} else {
 		showErrorDialog("Casting to ShortcutsWindow failed.")
