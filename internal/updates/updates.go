@@ -2,6 +2,7 @@ package updates
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Masterminds/semver"
 	"github.com/google/go-github/github"
@@ -14,14 +15,8 @@ var AppVersion string
 
 //IsUpdateAvailable checks wether there is a release with a higher version number and returns true if so.
 func IsUpdateAvailable() bool {
-	if len(AppVersion) == 0 {
-		//Omitting check, since this seems to be a development build.
-		return false
-	}
-
-	curentVersion, parseError := semver.NewVersion(AppVersion)
-	if parseError != nil {
-		//Omitting check, since this seems to be a development build.
+	currentVersion := VersionAsSemver()
+	if currentVersion == nil {
 		return false
 	}
 
@@ -39,12 +34,36 @@ func IsUpdateAvailable() bool {
 
 	tagAsSemver := semver.MustParse(release.GetTagName())
 
-	return tagAsSemver.GreaterThan(curentVersion)
+	return tagAsSemver.GreaterThan(currentVersion)
+}
+
+//VersionAsSemver creates a semver.Version of the current AppVersion string.
+//If the AppVersion string is invalid or empty it returns nil
+func VersionAsSemver() *semver.Version {
+	if len(AppVersion) == 0 {
+		//Omitting check, since this seems to be a development build.
+		return nil
+	}
+
+	currentVersion, parseError := semver.NewVersion(AppVersion)
+	if parseError != nil {
+		//Omitting check, since this seems to be a development build.
+		return nil
+	}
+
+	return currentVersion
 }
 
 //ShowUpToDateDialog informs the user that his installation is on the latest version.
 func ShowUpToDateDialog() {
-	upToDateDialog := gtk.MessageDialogNew(nil, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, gtk.BUTTONS_OK, "Your installation is up to date.")
+	message := ""
+	if VersionAsSemver() == nil {
+		message = "You are currently running a development build."
+	} else {
+		message = fmt.Sprintf("Your installation is up to date. You are currently running version %s.", AppVersion)
+	}
+
+	upToDateDialog := gtk.MessageDialogNew(nil, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, gtk.BUTTONS_OK, message)
 	upToDateDialog.Run()
 	upToDateDialog.Destroy()
 }
