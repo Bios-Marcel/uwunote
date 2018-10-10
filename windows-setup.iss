@@ -5,6 +5,7 @@
 AppName=UwU Note
 AppVersion={#UWU_VERSION}
 DefaultDirName={userappdata}\uwunote
+PrivilegesRequired=none
 
 OutputBaseFilename=uwunote-setup
 OutputDir=./
