@@ -31,10 +31,15 @@ FILL IN IF PRESENT
 `
 
 //ShowErrorDialog shows an error dialog to the user, offering him to report the issue on Github.
-//The errormessages will contain information about the users runtime and the error message.
+//The error messages will contain information about the users runtime and the error message.
 func ShowErrorDialog(err error) {
-	const titleMessage = "An error occurred"
-	title, _ := gtk.LabelNew("An error occurred")
+	ShowErrorDialogWithMessage("An error occurred.", err)
+}
+
+//ShowErrorDialog shows an error dialog to the user, offering him to report the issue on Github.
+//The error messages will contain information about the users runtime and the error message.
+func ShowErrorDialogWithMessage(message string, err error) {
+	title, _ := gtk.LabelNew(message)
 	title.SetHAlign(gtk.ALIGN_START)
 
 	errorMessage := fmt.Sprintf("The following error occurred during execution: \n\t%s", err.Error())
@@ -58,9 +63,10 @@ func ShowErrorDialog(err error) {
 	layout.Add(reportIssueLink)
 
 	errorDialog, _ := gtk.WindowNew(gtk.WINDOW_TOPLEVEL)
-	errorDialog.SetTitle(globconstants.ApplicationName + " - " + titleMessage)
+	errorDialog.SetTitle(globconstants.ApplicationName + " - Error")
 	errorDialog.Add(layout)
 	errorDialog.SetResizable(false)
+	errorDialog.SetPosition(gtk.WIN_POS_CENTER)
 
 	errorDialog.ShowAll()
 }
