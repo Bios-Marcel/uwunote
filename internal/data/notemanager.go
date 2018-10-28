@@ -3,9 +3,10 @@ package data
 import (
 	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	"github.com/Bios-Marcel/wastebasket"
-	uuid "github.com/satori/go.uuid"
+	"github.com/satori/go.uuid"
 
 	"github.com/UwUNote/uwunote/internal/config"
 )
@@ -32,8 +33,9 @@ func DeleteNote(file string) error {
 //CreateNote generates a new notefile and returns an error on failure.
 func CreateNote() (*string, error) {
 	fileName := uuid.Must(uuid.NewV4())
-	newNotePath := config.GetAppConfig().NoteDirectory + string(os.PathSeparator) + fileName.String()
+	newNotePath := filepath.Join(config.GetAppConfig().NoteDirectory, fileName.String())
 	newFile, createError := os.Create(newNotePath)
+
 	if createError != nil {
 		return nil, createError
 	}

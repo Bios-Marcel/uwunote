@@ -57,7 +57,7 @@ func LoadWindowConfiguration() {
 //PersistWindowConfiguration saves the current window configuration to its iven path
 func PersistWindowConfiguration() {
 	windowConfigurationJSON, _ := json.Marshal(&windowConfiguration)
-	writeError := ioutil.WriteFile(getWindowConfigPath(), windowConfigurationJSON, 0666)
+	writeError := ioutil.WriteFile(getWindowConfigPath(), windowConfigurationJSON, 0755)
 
 	errors.ShowErrorDialogOnError(writeError)
 }

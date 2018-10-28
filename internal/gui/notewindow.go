@@ -240,7 +240,8 @@ func deleteNoteGUI(appConfig *config.AppConfig, file string, win *gtk.Window, ki
 		config.PersistWindowConfiguration()
 
 		glib.IdleAdd(func() {
-			if !appConfig.ShowTrayIcon {
+			amountOfNotes, _ := data.GetAmountOfNotes()
+			if !appConfig.ShowTrayIcon && amountOfNotes == 0 {
 				noNotesDialog := gtk.MessageDialogNew(win, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_NONE, "All notes have been deleted.\nDo you want to create a new note or close the application?")
 
 				const responseNewNote = 0
@@ -284,9 +285,6 @@ func CreateNoteGUI(x, y, width, height int, nullableParent *gtk.Window) {
 	if createError == nil {
 		CreateWindowForNote(*newNotePath, x, y, width, height)
 	} else {
-		message := fmt.Sprintf("Error creating new note (%s).", createError.Error())
-		dialog := gtk.MessageDialogNew(nullableParent, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, message)
-		dialog.Run()
-		dialog.Destroy()
+		errors.ShowErrorDialogWithMessage("Error creating new note.", createError)
 	}
 }
