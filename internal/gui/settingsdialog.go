@@ -271,7 +271,7 @@ func ShowSettingsDialog() {
 	//Save on close
 	settingsWindow.Connect("destroy", func() {
 		//GeneralSettings
-		appConfig.AskBeforeNoteDeletion = deleteNotesToTrashbinSwitch.GetActive()
+		appConfig.DeleteNotesToTrashbin = deleteNotesToTrashbinSwitch.GetActive()
 		appConfig.AskBeforeNoteDeletion = askBeforeNoteDeletionSwitch.GetActive()
 		appConfig.NoteDirectory = noteDirectoryPicker.GetFilename()
 		appConfig.ShowTrayIcon = showTrayIconSwitch.GetActive()
