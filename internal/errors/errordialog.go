@@ -13,7 +13,7 @@ func ShowErrorDialog(err error) {
 	ShowErrorDialogWithMessage("An error occurred.", err)
 }
 
-//ShowErrorDialog shows an error dialog to the user, offering him to report the issue on Github.
+//ShowErrorDialogWithMessage shows an error dialog to the user, offering him to report the issue on Github.
 //The error messages will contain information about the users runtime and the error message.
 func ShowErrorDialogWithMessage(message string, err error) {
 	title, _ := gtk.LabelNew(message)

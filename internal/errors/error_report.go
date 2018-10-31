@@ -30,6 +30,7 @@ GTK: %s
 FILL IN IF PRESENT
 `
 
+//CreateIssueUrl creates a URL leading you to the "New Issue"-page of UwUNote with a prefilled issue title and body.
 func CreateIssueUrl(errorMessage string) string {
 	gtkVersion := fmt.Sprintf("%d.%d.%d", gtk.GetMajorVersion(), gtk.GetMinorVersion(), gtk.GetMicroVersion())
 	issueTemplateFilled := fmt.Sprintf(IssueTemplate, errorMessage, runtime.GOOS, runtime.GOARCH, gtkVersion)
