@@ -3,7 +3,6 @@
 package internal
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/UwUNote/uwunote/internal/errors"
@@ -15,8 +14,6 @@ import (
 )
 
 func buildSystray() {
-	fmt.Println("1.6 systray built.")
-
 	systray.SetIcon(gui.AppIcon)
 	newNoteItem := systray.AddMenuItem("New note", "Creates a new note")
 	systray.AddSeparator()

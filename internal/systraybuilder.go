@@ -16,8 +16,6 @@ import (
 )
 
 func buildSystray() {
-	fmt.Println("Non 1.6 systray built.")
-
 	systray.SetIcon(gui.AppIcon)
 	newNoteItem := systray.AddMenuItem("New note", "Creates a new note")
 	systray.AddSeparator()
