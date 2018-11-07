@@ -1,4 +1,4 @@
-// +build go1.6
+// +build go1.6,!go1.7
 
 package internal
 
@@ -15,6 +15,8 @@ import (
 )
 
 func buildSystray() {
+	fmt.Println("1.6 systray built.")
+
 	systray.SetIcon(gui.AppIcon)
 	newNoteItem := systray.AddMenuItem("New note", "Creates a new note")
 	systray.AddSeparator()
@@ -41,7 +43,6 @@ func buildSystray() {
 				open.Run(errors.CreateIssueUrl("None"))
 
 			case <-quitItem.ClickedCh:
-				fmt.Println("I am alive")
 				glib.IdleAdd(func() {
 					gtk.MainQuit()
 					os.Exit(0)
