@@ -24,8 +24,6 @@ type AppConfig struct {
 
 	NoteDirectory string
 
-	ShowTrayIcon bool
-
 	DefaultNoteWidth  int
 	DefaultNoteHeight int
 	DefaultNoteX      int
@@ -53,8 +51,6 @@ func GetAppConfigDefaults() AppConfig {
 		AutoIndent: true,
 
 		NoteDirectory: filepath.Join(util.HomeDir, "notes"),
-
-		ShowTrayIcon: true,
 
 		DefaultNoteWidth:  300,
 		DefaultNoteHeight: 350,

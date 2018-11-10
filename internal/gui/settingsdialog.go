@@ -112,16 +112,6 @@ func ShowSettingsDialog() {
 	deleteNotesToTrashbinSwitch.SetTooltipText(deleteNotesToTrashbinToolTip)
 	expandAndAlignRight(&deleteNotesToTrashbinSwitch.Widget)
 
-	//ShowTrayIcon
-	showTrayIconLabel, _ := gtk.LabelNew("Show tray icon")
-	showTrayIconSwitch, _ := gtk.SwitchNew()
-
-	showTrayIconLabel.SetHAlign(gtk.ALIGN_START)
-	showTrayIconToolTip := "Shows a tray icon in the systems tray area."
-	showTrayIconLabel.SetTooltipText(showTrayIconToolTip)
-	showTrayIconSwitch.SetTooltipText(showTrayIconToolTip)
-	expandAndAlignRight(&showTrayIconSwitch.Widget)
-
 	//GeneralSettings Tab
 	generalSettingsTab, _ := gtk.GridNew()
 	setupTab(generalSettingsTab)
@@ -232,7 +222,6 @@ func ShowSettingsDialog() {
 		deleteNotesToTrashbinSwitch.SetActive(appConfigToUse.DeleteNotesToTrashbin)
 		askBeforeNoteDeletionSwitch.SetActive(appConfigToUse.AskBeforeNoteDeletion)
 		noteDirectoryPicker.SetFilename(appConfigToUse.NoteDirectory)
-		showTrayIconSwitch.SetActive(appConfigToUse.ShowTrayIcon)
 
 		autoIndentSwitch.SetActive(appConfigToUse.AutoIndent)
 		autoSaveSwitch.SetActive(appConfigToUse.AutoSaveAfterTyping)
@@ -274,7 +263,6 @@ func ShowSettingsDialog() {
 		appConfig.DeleteNotesToTrashbin = deleteNotesToTrashbinSwitch.GetActive()
 		appConfig.AskBeforeNoteDeletion = askBeforeNoteDeletionSwitch.GetActive()
 		appConfig.NoteDirectory = noteDirectoryPicker.GetFilename()
-		appConfig.ShowTrayIcon = showTrayIconSwitch.GetActive()
 
 		//EditorSettings
 		appConfig.AutoSaveAfterTyping = autoSaveSwitch.GetActive()

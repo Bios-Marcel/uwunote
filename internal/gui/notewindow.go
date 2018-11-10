@@ -9,11 +9,78 @@ import (
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
+	"github.com/skratchdot/open-golang/open"
 
 	"github.com/UwUNote/uwunote/internal/config"
 	"github.com/UwUNote/uwunote/internal/data"
 	"github.com/UwUNote/uwunote/internal/errors"
 )
+
+var (
+	appMenu *gtk.Menu
+)
+
+func getAppMenu() *gtk.Menu {
+	if appMenu == nil {
+		var gtkError error
+		appMenu, gtkError = gtk.MenuNew()
+
+		newNoteItem, gtkError := gtk.MenuItemNewWithLabel("New note")
+		errors.ShowErrorDialogOnError(gtkError)
+		newNoteItem.SetTooltipText("Creates a new note")
+		newNoteItem.Connect("activate", func() {
+			CreateNoteGUIWithDefaults()
+		})
+
+		separatorOne, gtkError := gtk.SeparatorMenuItemNew()
+		errors.ShowErrorDialogOnError(gtkError)
+
+		settingsItem, gtkError := gtk.MenuItemNewWithLabel("Settings")
+		errors.ShowErrorDialogOnError(gtkError)
+		settingsItem.SetTooltipText("Opens the settings")
+		settingsItem.Connect("activate", func() {
+			ShowSettingsDialog()
+		})
+
+		shortcutsItem, gtkError := gtk.MenuItemNewWithLabel("Shortcuts")
+		errors.ShowErrorDialogOnError(gtkError)
+		shortcutsItem.SetTooltipText("Opens the shortcuts dialog")
+		shortcutsItem.Connect("activate", func() {
+			ShowShortcutsDialog()
+		})
+
+		reportIssueItem, gtkError := gtk.MenuItemNewWithLabel("Report issue")
+		errors.ShowErrorDialogOnError(gtkError)
+		reportIssueItem.SetTooltipText("Report an application related issue on GitHub")
+		reportIssueItem.Connect("activate", func() {
+			open.Run(errors.CreateIssueUrl("None"))
+		})
+
+		separatorTwo, gtkError := gtk.SeparatorMenuItemNew()
+		errors.ShowErrorDialogOnError(gtkError)
+
+		quitItem, gtkError := gtk.MenuItemNewWithLabel("Quit")
+		errors.ShowErrorDialogOnError(gtkError)
+		quitItem.SetTooltipText("Closes the application")
+		quitItem.Connect("activate", func() {
+			gtk.MainQuit()
+			os.Exit(0)
+		})
+
+		appMenu.Append(newNoteItem)
+		appMenu.Append(separatorOne)
+		appMenu.Append(settingsItem)
+		appMenu.Append(shortcutsItem)
+		appMenu.Append(reportIssueItem)
+		appMenu.Append(separatorTwo)
+		appMenu.Append(quitItem)
+		appMenu.ShowAll()
+	}
+
+	fmt.Println(appMenu)
+
+	return appMenu
+}
 
 //CreateWindowForNote creates a window at the given position and with the
 //given dimensions, that contains the content of the passed file.
@@ -53,6 +120,10 @@ func CreateWindowForNote(file string, x, y, width, height int) {
 	errors.ShowErrorDialogOnError(gtkError)
 
 	titleBar.PackStart(newButton)
+	menuButton, gtkError := gtk.MenuButtonNew()
+	errors.ShowErrorDialogOnError(gtkError)
+	menuButton.SetPopup(getAppMenu())
+	titleBar.Add(menuButton)
 	titleBar.PackEnd(deleteButton)
 
 	var hAdjustment, vAdjustment *gtk.Adjustment
@@ -241,7 +312,7 @@ func deleteNoteGUI(appConfig *config.AppConfig, file string, win *gtk.Window, ki
 
 		glib.IdleAdd(func() {
 			amountOfNotes, _ := data.GetAmountOfNotes()
-			if !appConfig.ShowTrayIcon && amountOfNotes == 0 {
+			if amountOfNotes == 0 {
 				noNotesDialog := gtk.MessageDialogNew(win, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_NONE, "All notes have been deleted.\nDo you want to create a new note or close the application?")
 
 				const responseNewNote = 0

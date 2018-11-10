@@ -29,15 +29,7 @@ func Start() {
 
 	os.MkdirAll(config.GetAppConfig().NoteDirectory, 0755)
 
-	if config.GetAppConfig().ShowTrayIcon {
-		startWithTrayIcon()
-	} else {
-		startAndInitGtk()
-	}
-}
-
-func systemTrayRun() {
-	buildSystray()
+	startAndInitGtk()
 }
 
 //startAndInitGtk initializes gtk, invokes `start` and triggers the gtk mainloop.
@@ -45,14 +37,10 @@ func startAndInitGtk() {
 	// Initialize GTK without parsing any command line arguments.
 	gtk.Init(nil)
 
-	start()
+	glib.IdleAdd(generateNoteWindows)
 
 	// Begin executing the GTK main loop. This blocks until gtk.MainQuit() is run.
 	gtk.Main()
-}
-
-func start() {
-	glib.IdleAdd(generateNoteWindows)
 }
 
 //Creates a window for every note inside of the notePath

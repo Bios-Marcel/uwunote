@@ -61,10 +61,6 @@ as the last command instead, that will put a ready to use binary called `uwunote
 
 ### Linux
 
-In addition to the default dependencies, linux needs additional dependencies:
-
-* libappindicator
-
 You can most likely install all dependencies via your systems packagemanager.
 
 ### Windows
