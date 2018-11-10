@@ -1,4 +1,4 @@
-// +build windows darwin
+// +build !no_systray,windows !no_systray,darwin
 
 package internal
 

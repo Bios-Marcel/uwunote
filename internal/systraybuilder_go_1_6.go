@@ -1,4 +1,4 @@
-// +build go1.6,!go1.7
+// +build !no_systray,go1.6,!go1.7
 
 package internal
 

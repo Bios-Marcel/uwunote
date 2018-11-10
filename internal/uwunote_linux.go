@@ -1,4 +1,4 @@
-// +build !windows,!mac
+// +build !no_systray,!windows,!mac
 
 package internal
 
