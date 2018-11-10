@@ -77,8 +77,6 @@ func getAppMenu() *gtk.Menu {
 		appMenu.ShowAll()
 	}
 
-	fmt.Println(appMenu)
-
 	return appMenu
 }
 
