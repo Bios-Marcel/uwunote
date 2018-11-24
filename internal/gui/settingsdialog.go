@@ -254,7 +254,7 @@ func ShowSettingsDialog() {
 
 	settingsWindow.SetSkipTaskbarHint(true)
 	settingsWindow.SetSkipPagerHint(true)
-
+	settingsWindow.SetTypeHint(gdk.WINDOW_TYPE_HINT_UTILITY)
 	settingsWindow.SetPosition(gtk.WIN_POS_CENTER)
 
 	//Save on close
